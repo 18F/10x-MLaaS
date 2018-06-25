@@ -1,4 +1,6 @@
 # Survey Comment Classification:  Spam or Ham?
+This folder contains two notebooks. In order for these to run, you'll need to
+manually move the required assets into your local copy of the repo.
 
 ## Definitions
   - **Spam**: Spam is defined broadly to mean any survey response that doesn't
@@ -18,13 +20,11 @@
     - `Please tell us why you were not able to fully complete the purpose of your
       visit today.`
 
-## Classifying New Comments
-  1. Visit https://admin-survey.usa.gov/ to get the most recent responses.
-    - Choose the site-wide survey:  `USA.gov Customer Satisfaction Survey`
-    - Choose to receive the csv format emailed to you.
-  2. Download the responses that have been emailed to you.
-  3. Move the file (e.g. `201806121828-USA.gov_Cus-1.1.csv`) to the `unlabeled_data` directory.
-  4. Open `ModelTraining.ipynb` and follow the steps therein
+## ModelTraining.ipynb
+  - This notebook contains exploratory data analysis and model selection
+  work. It's main output is a pickled sklearn model that can be used to predict
+  on unseen data.
 
-## Training the Comment Classifier
-  1. Open `CommentClassification.ipynb`. You can find documentation there.
+## CommentClassification.ipynb
+  - This notebook unpickles a model identified in ModelTraining.ipynb and uses
+  it to predict on new data.
