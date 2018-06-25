@@ -27,4 +27,4 @@
   4. Open `ModelTraining.ipynb` and follow the steps therein
 
 ## Training the Comment Classifier
-  1. Open `ModelTraining.ipynb`. You can find documentation there.
+  1. Open `CommentClassification.ipynb`. You can find documentation there.
