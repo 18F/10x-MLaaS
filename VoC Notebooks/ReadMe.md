@@ -29,6 +29,7 @@ This folder contains two notebooks. In order for these to run, you'll need to ma
     - So long as the training dataset remains small, someone will need to periodically review new predictions, hand correcting mis-classifications, and add to the training dataset before re-training the model.
   - The survey questions might benefit from revisions that narrow their scope
     - Some of the questions overlap while others are somewhat vague and yet another actually asks two questions. This greatly increases the scope of possible responses, which makes a machine learning classifier's job much more difficult (especially when the training dataset is small).
+  - The site-wide survey sometimes triggers right when people first visit the site and haven't had a chance to actually experience anything.
   - Binary classifcation (spam vs ham) is useful for the analytics team, but the content team will want further granularity, i.e. classification of useful vs not-useful comments.
 
 ## Next Steps
