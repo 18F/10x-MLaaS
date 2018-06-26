@@ -29,6 +29,7 @@ This folder contains two notebooks. In order for these to run, you'll need to ma
     - So long as the training dataset remains small, someone will need to periodically review new predictions, hand correcting mis-classifications, and add to the training dataset before re-training the model.
   - The survey questions might benefit from revisions that narrow their scope
     - Some of the questions overlap while others are somewhat vague and yet another actually asks two questions. This greatly increases the scope of possible responses, which makes a machine learning classifier's job much more difficult (especially when the training dataset is small).
+  - Binary classifcation (spam vs ham) is useful for the analytics team, but the content team will want further granularity, i.e. classification of useful vs not-useful comments.
 
 ## Next Steps
   - Hand-label responses to the other two open-ended fields in the site-wide survey and then train/test models.
@@ -38,8 +39,9 @@ This folder contains two notebooks. In order for these to run, you'll need to ma
     - Combine site-wide and page-level training data to create a new model and test on both the page- and site-level responses to see if there are improvements.
   - Once we have suitable models for all of the comment fields, explore the possibility of predicting the class for all four comments at once. This would involve using the class prediction as an input for the class prediction of another model. 
   - Create Command Line version of this tool. Or use tkinter to create a simple GUI.
+  - Implement classification of useful vs not-useful comments.
 
-## Proposed Sustainable Process
+## Proposed *Sustainable* Process
 In order for this project to outlive the term of my rotation, it needs to be easy to use. That means codifying the process and providing a simple means to execute. 
 ### The Process
 *Assumption*: This assumes we've hand-labeled plenty of data and have trained suitable models for each comment field.
