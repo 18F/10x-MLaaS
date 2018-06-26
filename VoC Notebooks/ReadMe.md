@@ -2,7 +2,7 @@
 This folder contains two notebooks. In order for these to run, you'll need to
 manually move the required assets into your local copy of the repo.
 
-## Definitions
+## Key Terms
   - **Spam**: Spam is defined broadly to mean any survey response that doesn't
     provide meaningful, relevant information.
   - **Ham**:  Ham is defined broadly to mean any survey response that provides
@@ -28,3 +28,31 @@ manually move the required assets into your local copy of the repo.
 ## CommentClassification.ipynb
   - This notebook unpickles a model identified in ModelTraining.ipynb and uses
   it to predict on new data.
+
+## Limitations
+  - Model training can be time consuming since hyper-parameter grid
+  searching has combinatorial complexity.
+    - A possible solution would be to substitute RandomizedSearchCV for
+      GirdSearchCV
+  - Supervised learning requires human involvement
+    - So long as the training dataset remains small, someone will need to
+    periodically review new predictions, hand correcting mis-classifications,
+    and add to the training dataset before re-training the model.
+    - This process could be facilitated by a GUI, such as one created with
+    `tkinter`
+  - The survey questions might benefit from revisions that narrow their scope
+    - Some of the questions overlap while others are somewhat vague and yet
+    another actually asks two questions. This greatly increases the scope of
+    possible responses, which makes a machine learning classifier's job much
+    more difficult (especially when the training dataset is small).
+
+## Next Steps
+  - Hand-label responses to the other two open-ended fields in the site-wide survey and then train/test models.
+  - Expand to the page-level surveys
+    - First, hand-label responses
+    - Then try to use models created from the site-wide survey
+    - Combine site-wide and page-level training data to create a new model
+    and test on both the page- and site-level responses to see if there are improvements.
+  - Once we have suitable models for all of the comment fields, explore the
+  possibility of predicting the class for all four comments at once. This would
+  involve using the class prediction as an input for the class prediction of another model.  
