@@ -37,10 +37,11 @@ class QualtricsApi:
                  SurveyResponsePath='survey_responses'):
 
         assert (fileFormat == 'csv'),"Only supports csv file format for now."
+        with open('secrets.json','r') as f:
+            loaded_json = json.loads(f.read())
+            self.apiToken = loaded_json['apiToken']
+            self.surveyId = loaded_json['surveyId']
 
-        loaded_json = json.loads('secrets.json')
-        self.apiToken = loaded_json['apiToken']
-        self.surveyId = loaded_json['surveyId']
         self.fileFormat = fileFormat
         self.dataCenter = dataCenter
         if not os.path.exists(SurveyResponsePath):
