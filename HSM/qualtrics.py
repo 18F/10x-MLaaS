@@ -29,8 +29,8 @@ class QualtricsApi:
     """
 
     def __init__(self,
-                 apiToken='Nt30jtwa57XxBf9st3ebx7hiWpQTeSZ3SYsvIY1F',
-                 surveyId='SV_4IL1lhWMo7LhrjD',
+                 apiToken=None,
+                 surveyId=None,
                  fileFormat='csv',
                  dataCenter='cemgsa',
                  SurveyResponsePath='survey_responses'):
