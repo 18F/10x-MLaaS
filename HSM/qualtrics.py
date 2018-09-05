@@ -9,6 +9,7 @@ from time import sleep, strftime
 import subprocess
 import stat
 import warnings
+import json
 
 warnings.filterwarnings('ignore')
 
@@ -29,16 +30,17 @@ class QualtricsApi:
     """
 
     def __init__(self,
-                 apiToken='Nt30jtwa57XxBf9st3ebx7hiWpQTeSZ3SYsvIY1F',
-                 surveyId='SV_4IL1lhWMo7LhrjD',
+                 apiToken=None,
+                 surveyId=None,
                  fileFormat='csv',
                  dataCenter='cemgsa',
                  SurveyResponsePath='survey_responses'):
 
         assert (fileFormat == 'csv'),"Only supports csv file format for now."
 
-        self.apiToken = apiToken
-        self.surveyId = surveyId
+        loaded_json = json.loads('secrets.json')
+        self.apiToken = loaded_json['apiToken']
+        self.surveyId = loaded_json['surveyId']
         self.fileFormat = fileFormat
         self.dataCenter = dataCenter
         if not os.path.exists(SurveyResponsePath):
