@@ -29,19 +29,21 @@ class QualtricsApi:
 
     """
 
+    with open('secrets.json','r') as f:
+        loaded_json = json.loads(f.read())
+        apiToken = loaded_json['apiToken']
+        surveyId = loaded_json['surveyId']
+
     def __init__(self,
-                 apiToken=None,
-                 surveyId=None,
+                 apiToken=apiToken,
+                 surveyId=surveyId,
                  fileFormat='csv',
                  dataCenter='cemgsa',
                  SurveyResponsePath='survey_responses'):
 
-        assert (fileFormat == 'csv'),"Only supports csv file format for now."
-        with open('secrets.json','r') as f:
-            loaded_json = json.loads(f.read())
-            self.apiToken = loaded_json['apiToken']
-            self.surveyId = loaded_json['surveyId']
 
+        self.apiToken = apiToken
+        self.surveyId = surveyId
         self.fileFormat = fileFormat
         self.dataCenter = dataCenter
         if not os.path.exists(SurveyResponsePath):
@@ -226,7 +228,6 @@ class QualtricsApi:
             updated_db = pd.concat([db,final_df])
             updated_db = updated_db.drop_duplicates(subset='ResponseID')
             updated_db.to_csv(db_path, index=False)
-
 
 
 qa = QualtricsApi()
