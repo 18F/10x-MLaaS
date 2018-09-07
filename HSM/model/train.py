@@ -15,7 +15,8 @@ from sklearn.svm import LinearSVC
 #in order to use SMOTE, you've got to import Pipeline from imblearn
 from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
-from transformers import NormalizeText, ColumnExtractor, OrdinalTransformer, CharLengthExtractor, DateTransformer, TfidfEmbeddingVectorizer
+from model.transformers import ColumnExtractor, OrdinalTransformer, CharLengthExtractor, DateTransformer, TfidfEmbeddingVectorizer
+from model.text_utils import NormalizeText
 
 warnings.filterwarnings('ignore')
 

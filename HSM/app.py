@@ -1,5 +1,6 @@
 import qualtrics
 import os
+import model.predict
 
 qa = qualtrics.QualtricsApi()
 qa.download_responses()
@@ -13,6 +14,11 @@ if os.path.exists(model_path):
     pass
     print("A trained model already exists, so let's use it!")
     # TODO: check if we've hit a threshold for newly labeled data
+    db_path = os.path.join(os.getcwd(),'db','db.csv')
+    nd = ClassifyNewData(db_path,'Value')
+    nd.get_new_data()
+    nd.predict()
+    print("Done making predictions. You can find the results in ClassificationResults.xlsx")
 
 else:
     pass
