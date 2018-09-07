@@ -223,8 +223,3 @@ class QualtricsApi:
             updated_db = pd.concat([db,final_df])
             updated_db = updated_db.drop_duplicates(subset='ResponseID')
             updated_db.to_csv(db_path, index=False)
-
-
-qa = QualtricsApi()
-qa.download_responses()
-qa.update_db()
