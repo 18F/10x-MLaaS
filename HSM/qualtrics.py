@@ -15,32 +15,29 @@ warnings.filterwarnings('ignore')
 
 
 class QualtricsApi:
-    """Query Qualtrics API, write responses, and return them as a pandas
-       DataFrame.
+    """Query Qualtrics API for new survey responses and then write to database.
 
     Attributes:
-        apiToken (str): your Qualtrics API token.
+        apiToken (str): a Qualtrics API token.
         surveyId (str): the survey id.
         fileFormat (str): the preferred file format. Only 'csv' is possible now.
-        dataCenter (str): the datacenter from the hostname of your qualtrics
+        dataCenter (str): the datacenter from the hostname of the qualtrics
                           account url
-        SurveyResponsePath (str): the directory name you'd like to dump the
-                                  responses
-
+        SurveyResponsePath (str): the directory name to dump the responses
     """
 
-    with open('secrets.json','r') as f:
-        loaded_json = json.loads(f.read())
-        apiToken = loaded_json['apiToken']
-        surveyId = loaded_json['surveyId']
-
     def __init__(self,
-                 apiToken=apiToken,
-                 surveyId=surveyId,
+                 apiToken=None,
+                 surveyId=None,
                  fileFormat='csv',
                  dataCenter='cemgsa',
                  SurveyResponsePath='survey_responses'):
 
+        if not apiToken and not surveyId:
+            with open('secrets.json','r') as f:
+                loaded_json = json.loads(f.read())
+                apiToken = loaded_json['apiToken']
+                surveyId = loaded_json['surveyId']
 
         self.apiToken = apiToken
         self.surveyId = surveyId
@@ -51,13 +48,12 @@ class QualtricsApi:
         self.SurveyResponsePath = SurveyResponsePath
         try:
             with open('pastResponseId.txt','r') as f:
+                line_list = f.read().splitlines()
                 try:
-                    head = [next(f) for i in range(2)] #read first two lines
-                    self.lastResponseId = head[0]
-                    self.penultimateResponseId = head[1]
-                except StopIteration:
-                    self.lastResponseId = f.read()
-                    self.penultimateResponseId = None
+                    self.lastResponseId = line_list[0]
+                    self.penultimateResponseId = line_list[1]
+                except IndexError:
+                    self.penultimateResponseId = self.lastResponseId
         except FileNotFoundError:
             self.lastResponseId = None
             self.penultimateResponseId = None
@@ -86,7 +82,6 @@ class QualtricsApi:
         headers = {"content-type": "application/json",
                    "x-api-token": self.apiToken,
                   }
-
         # Step 1: Creating Data Export
         downloadRequestUrl = baseUrl
         # Include lastResponseId in payload if provided during init
