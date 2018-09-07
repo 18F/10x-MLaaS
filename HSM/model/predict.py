@@ -11,6 +11,9 @@ import re
 import sys
 import numpy as np
 from math import sin, cos, pi
+import warnings
+
+warnings.filterwarnings('ignore')
 
 # These might need to stay global until I can figure out how to include in the sklearn Pipeline.
 nlp = spacy.load('en', parse = False, tag=False, entity=False)
