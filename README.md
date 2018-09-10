@@ -28,3 +28,7 @@ Once you've got those assets (and all of the Python dependencies) you're ready t
  - extend to the three other page-level comment fields
  - be dockerized
  - not have to load the word embeddings if they're not going to be used
+ - not use a csv as a databse (Postgres?)
+ - have an API that exposes all of these back-end operations
+ - extend to the site-wide survey
+ - have tests
