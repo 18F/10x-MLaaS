@@ -18,6 +18,7 @@ Once you've got those assets (and all of the Python dependencies) you're ready t
  - Trains a ham-spam classifier if you don't already have one (takes about 15 minutes)
  - Uses the classifier to predict on the new data you've just downloaded, writing results to an excel file for review
  - Asks you to review the prediction results in `HSM/model/results/`
+    - When reviewing the results, the comment is in the `Value` column and the prediction is in the `Value Spam` column (0 = ham and 1 = spam)
  - Once you've been able to review the predictions and save your corrections, tell the script you've done so and it'll write the corrected predictions back into the database.
  
  In the future, it'll:
