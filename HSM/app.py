@@ -13,7 +13,7 @@ qa.update_db()
 model_path = os.path.join(os.getcwd(),
                           'model',
                           'best_estimators',
-                          'Valuetest_roc_auc_best_estimator.pkl')
+                          'Value_roc_auc_best_estimator.pkl')
 
 if os.path.exists(model_path):
     print("A trained model already exists, so let's use it!")
