@@ -12,7 +12,7 @@ import sys
 import numpy as np
 from math import sin, cos, pi
 import warnings
-from model.text_utils import NormalizeText
+from text_utils import NormalizeText
 
 warnings.filterwarnings('ignore')
 

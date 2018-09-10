@@ -7,9 +7,6 @@ from math import sin, cos, pi
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.base import BaseEstimator, TransformerMixin
-from nltk.tokenize.toktok import ToktokTokenizer
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
 import gensim.downloader as api
 import os
 

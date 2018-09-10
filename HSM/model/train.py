@@ -6,8 +6,7 @@ import sys
 from sklearn import metrics
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.pipeline import FeatureUnion
-from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
-from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingClassifier, ExtraTreesClassifier
 from sklearn.feature_selection import SelectPercentile, f_classif
 from sklearn.linear_model import SGDClassifier, LogisticRegression
 from sklearn.preprocessing import StandardScaler
@@ -15,8 +14,8 @@ from sklearn.svm import LinearSVC
 #in order to use SMOTE, you've got to import Pipeline from imblearn
 from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
-from model.transformers import ColumnExtractor, OrdinalTransformer, CharLengthExtractor, DateTransformer, TfidfEmbeddingVectorizer
-from model.text_utils import NormalizeText
+from transformers import ColumnExtractor, OrdinalTransformer, CharLengthExtractor, DateTransformer, TfidfEmbeddingVectorizer
+from text_utils import NormalizeText
 
 warnings.filterwarnings('ignore')
 
@@ -90,13 +89,11 @@ def grid_search(data=labeled_data_df,
                                                         random_state=123)
 
 
-    classifiers = [RandomForestClassifier(),
-                  ExtraTreesClassifier(),
-                  AdaBoostClassifier(),
-                  GradientBoostingClassifier(),
-                  SGDClassifier(),
-                  LogisticRegression(),
-                  LinearSVC()]
+    classifiers = [SGDClassifier(),
+                   ExtraTreesClassifier(),
+                   GradientBoostingClassifier(),
+                   LogisticRegression(),
+                   LinearSVC()]
 
     scoring = {'accuracy': metrics.make_scorer(metrics.accuracy_score),
                'roc_auc': metrics.make_scorer(metrics.roc_auc_score),
@@ -140,88 +137,65 @@ def grid_search(data=labeled_data_df,
                         ('select', SelectPercentile(f_classif)),
                         ('clf', clf)])
 
-
-        if 'Random' in clf_name:
+        if "Extra" in clf_name:
             param_grid = [
-                            {'clf__max_depth': [5,20,None],
+                            {'clf__max_depth': [5,15,None],
                              'clf__max_features': ['sqrt',None],
-                             'clf__min_samples_leaf': [2,5,10],
-                             'clf__min_samples_split': [2,5,10],
-                             'clf__n_estimators': [300,500,800,1200],
-                             'features__word2vec__vectorizer__vectorizer': ['ft','tf_idf'],
+                             'clf__min_samples_leaf': [2,5,8],
+                             'clf__min_samples_split': [2,5,8],
+                             'clf__n_estimators': [800,1200],
+                             'features__word2vec__vectorizer__vectorizer': ['ft'],
                              'select': [None],
                              'upsample': [None]}
-                        ]
-
-        elif "Extra" in clf_name:
-            param_grid = [
-                            {'clf__max_depth': [5,20,None],
-                             'clf__max_features': ['sqrt',None],
-                             'clf__min_samples_leaf': [2,50,10],
-                             'clf__min_samples_split': [2,5],
-                             'clf__n_estimators': [500,800,1200],
-                             'features__word2vec__vectorizer__vectorizer': ['ft','tf_idf'],
-                             'select': [None],
-                             'upsample': [None]}
-                        ]
-
+                           ]
 
         elif 'Gradient' in clf_name:
             param_grid = [
                             {
-                              'features__word2vec__vectorizer__vectorizer':['ft','tf_idf'],
-                              'upsample':[None],#,SMOTE(kind='svm')
-                              'select': [None],#SelectPercentile(f_classif, percentile=50)
-                              'clf__n_estimators':[1200],
+                              'features__word2vec__vectorizer__vectorizer':['ft'],
+                              'upsample':[None],
+                              'select': [None],
+                              'clf__n_estimators':[800,1200],
                               'clf__learning_rate':[0.0001, 0.001, 0.01, 0.1, 0.2, 0.3],
                               'clf__max_depth':[3,5,8,10,15,30],
                               'clf__max_features':['sqrt'],
                             }
-                        ]
-
-        elif "AdaBoost" in clf_name:
-            param_grid = [
-
-                            {
-                              'features__word2vec__vectorizer__vectorizer':['ft','tf_idf'],
-                              'upsample':[None],
-                              'select': [None],
-                              'clf__n_estimators':[400,800,1200],
-                              'clf__learning_rate':[0.0001, 0.001, 0.01, 0.1, 0.2, 0.3]
-                            }
-                        ]
+                           ]
 
         elif "Linear" in clf_name:
             param_grid = [
                             {
-                              'features__word2vec__vectorizer__vectorizer':['ft','tf_idf'],
+                              'features__word2vec__vectorizer__vectorizer':['ft'],
                               'upsample':[None],
                               'select': [None],
                               'clf__C':[.001,.01,.1,1.0,10,100],
-                              'clf__penalty':['l1','l2'],
+                              'clf__penalty':['l2'],
                               'clf__loss':['hinge','squared_hinge'],
-                              'clf__class_weight':[None]
+                              'clf__class_weight':[None,'balanced']
                             }
                         ]
 
         elif "Logistic" in clf_name:
             param_grid = [
                             {
-                              'features__word2vec__vectorizer__vectorizer':['ft','tf_idf'],
+                              'features__word2vec__vectorizer__vectorizer':['ft'],
                               'upsample':[None],
                               'select': [None],
                               'clf__penalty':['l2','l1'],
-                              'clf__C':[100,10,1.0,.1,.01,.001]
+                              'clf__C':[100,10,1.0,.1,.01,.001],
+                              'clf__class_weight':[None,'balanced']
                             }
                         ]
         elif "SGD" in clf_name:
             param_grid = [
                             {
-                              'features__word2vec__vectorizer__vectorizer':['ft','tf_idf'],
+                              'features__word2vec__vectorizer__vectorizer':['ft'],
                               'upsample':[None],
                               'select': [None],
                               'clf__penalty':['l2','l1'],
-                              'clf__alpha':[1.0,.1,.01]
+                              'clf__loss':['hinge','modified_huber'],
+                              'clf__alpha':[1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3],
+                              'clf__class_weight':[None,'balanced']
                             }
                         ]
 
@@ -264,6 +238,8 @@ def grid_search(data=labeled_data_df,
         print("\tFbeta on test data:  {0:.2f}".format(fbeta))
         print("\tAverage Precision on test data:  {0:.2f}".format(average_precision))
         print("\tPrecision-Recall AUC on test data:  {0:.2f}".format(auc))
+        print(f"\tBest estimator:{best_estimator}")
+        print(f"\tBest params:{best_params}")
 
     return results
 
