@@ -5,7 +5,7 @@ import sys
 class UpdateDb():
 
     def __init__(self):
-        id_path = os.path.join("/Users",'scottmcallister','Desktop','GitHub','10x-qualitative-data','HSM','pastResponseId.txt')
+        id_path = 'pastResponseId.txt'
         try:
             with open(id_path,'r') as f:
                     lines = f.read().splitlines()
@@ -15,8 +15,8 @@ class UpdateDb():
                         #if only 1 id, then there's no penultimate
                         self.penultimateResponseId = None
         except FileNotFoundError:
-            print("Can't update the db without data! Run qualtrics.py first.")
-            sys.exit(0)
+            self.penultimateResponseId = None
+
 
     def update_db(self):
         db_path = os.path.join('db','db.csv')
@@ -51,7 +51,3 @@ class UpdateDb():
             db_df['Value Spam'] = db_df['ResponseID'].map(merged_id_pred_map)
 
         db_df.to_csv(db_path,index=False)
-
-ud = UpdateDb()
-ud.update_db()
-print("Done updating the database with (hopefully reviewed) predictions.")

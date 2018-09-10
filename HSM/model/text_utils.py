@@ -115,7 +115,7 @@ class NormalizeText():
             Read in a list of profanity from profanity.csv and return it as a
             set.
             """
-            file_path = os.path.join(os.getcwd(),"corpora","profanity.csv")
+            file_path = os.path.join(os.getcwd(),"model","corpora","profanity.csv")
             profanity = set(pd.read_csv(file_path).values.ravel().tolist())
             return profanity
 

@@ -22,12 +22,12 @@ class ClassifyNewData():
     def __init__(self, db_path, model):
         self.db_path = db_path
         if model == 'Value':
-            model_name = model+'test_roc_auc_best_estimator.pkl'
-            model_path = os.path.join("/Users",'scottmcallister','Desktop','GitHub','10x-qualitative-data','HSM','model','best_estimators',model_name)
+            model_name = model+'_roc_auc_best_estimator.pkl'
+            model_path = os.path.join(os.getcwd(),'model','best_estimators',model_name)
             self.model = model_path
         else:
             self.model = None
-        id_path = os.path.join("/Users",'scottmcallister','Desktop','GitHub','10x-qualitative-data','HSM','pastResponseId.txt')
+        id_path = os.path.join(os.getcwd(),'pastResponseId.txt')
         try:
             with open(id_path,'r') as f:
                     lines = f.read().splitlines()
@@ -41,17 +41,20 @@ class ClassifyNewData():
             sys.exit(0)
 
     def get_new_data(self):
-        db = pd.read_csv(db_path)
+        db = pd.read_csv(self.db_path,encoding='latin1')
         if self.penultimateResponseId:
             idx = db.index[db['ResponseID'] == self.penultimateResponseId].tolist()[0]
             db = db.iloc[idx+1:]
+        else:
+            pass
         if db.size == 0:
-            print("No new data to predict on!")
+            print("No new data to predict on! Exiting the script. Try again later.")
             sys.exit(0)
+        db = db.dropna(subset=['Value'])
         nt = NormalizeText()
         normalized_text = nt.transform(db['Value'])
         db['Normalized Value'] = normalized_text
-        db = db.dropna(subset=['Value'])
+
         ordinal_questions = ["Experience Rating",
                              "Likely to Return",
                              "Likely to Recommend",
@@ -101,17 +104,10 @@ class ClassifyNewData():
             dec_func = pickled_model.decision_function(new_data)
             new_data['Value Spam'] = preds
             new_data['Value Decision Boundary Distance'] = abs(dec_func)
-        results_dir = os.path.join(os.getcwd(),'results')
+        results_dir = os.path.join(os.getcwd(),'model','results')
         if not os.path.exists(results_dir):
             os.makedirs(os.path.join(results_dir))
         results_path = os.path.join(results_dir,'ClassificationResults.xlsx')
         writer = pd.ExcelWriter(results_path)
         new_data.to_excel(writer,'Classification Results',index=False)
         writer.save()
-
-
-db_path = os.path.join("/Users",'scottmcallister','Desktop','GitHub','10x-qualitative-data','HSM','db','db.csv')
-nd = ClassifyNewData(db_path,'Value')
-nd.get_new_data()
-nd.predict()
-print("Done making predictions. You can find the results in ClassificationResults.xlsx")

@@ -32,7 +32,7 @@ class QualtricsApi:
                  fileFormat='csv',
                  dataCenter='cemgsa',
                  SurveyResponsePath='survey_responses'):
-
+        print("Getting data from Qualtrics.")
         if not apiToken and not surveyId:
             with open('secrets.json','r') as f:
                 loaded_json = json.loads(f.read())
@@ -120,7 +120,7 @@ class QualtricsApi:
 
         # Step 4: Unzipping the file
         zipfile.ZipFile(io.BytesIO(requestDownload.content)).extractall(self.SurveyResponsePath)
-        print('Complete!')
+        print('Merging downloaded Qualtrics data...')
 
     def update_db(self):
         """
@@ -223,3 +223,5 @@ class QualtricsApi:
             updated_db = pd.concat([db,final_df])
             updated_db = updated_db.drop_duplicates(subset='ResponseID')
             updated_db.to_csv(db_path, index=False)
+        print("Done updating database with new Qualtrics data!")
+        print("-"*80)
