@@ -11,7 +11,7 @@ Before you can run the script, you'll need a `secrets.json` with your Qualtrics 
 
 Once you've got those things, here's what happens when you run `python app.py`:
  - Gets survey responses from the Qualtrics API using the latest responseId on hand. If you don't have any responses yet, then you're running this for the first time and it'll download all of the responses to-date, placing them in `db.csv`
- - Trains a ham-spam classifier if you don't already have one
+ - Trains a ham-spam classifier if you don't already have one (takes about 10 minutes)
  - Uses the classifier to predicts on the new data you've just downloaded, writing results to an excel file for review
  - Once you've been able to review the predictions and save your corrections, the script writes the corrected predictions back to the database
  
