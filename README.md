@@ -5,7 +5,7 @@ Repository for the 10x qualitative data management project.
 This contains the original Jupyter Notebooks that developed the ham-spam classifier, which we've come to term the Ham-Spam Machine (HSM).
 
 ## HSM
-`app.py` is a command line interface version of the Ham-Spam Machine (HSM). Currently, it only classifies comments in response to the **Please tell us what you value most about this site** question.
+`app.py` is a command line interface version of the Ham-Spam Machine (HSM). Currently, it only classifies comments in response to the **Please tell us what you value most about this site** question on the **site-wide version** of the survey.
 
 Before you can run the script, you'll need a `secrets.json` with your Qualtrics credentials placed within the root directory. You'll also need the training data (`model/training_data/train.csv`) and a list of profanity (`model/corpora/profanity.csv`). 
 
