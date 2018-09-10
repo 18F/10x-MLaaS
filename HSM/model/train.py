@@ -14,8 +14,8 @@ from sklearn.svm import LinearSVC
 #in order to use SMOTE, you've got to import Pipeline from imblearn
 from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
-from transformers import ColumnExtractor, OrdinalTransformer, CharLengthExtractor, DateTransformer, TfidfEmbeddingVectorizer
-from text_utils import NormalizeText
+from model.transformers import ColumnExtractor, OrdinalTransformer, CharLengthExtractor, DateTransformer, TfidfEmbeddingVectorizer
+from model.text_utils import NormalizeText
 
 warnings.filterwarnings('ignore')
 
@@ -139,11 +139,11 @@ def grid_search(data=labeled_data_df,
 
         if "Extra" in clf_name:
             param_grid = [
-                            {'clf__max_depth': [5,15,None],
-                             'clf__max_features': ['sqrt',None],
-                             'clf__min_samples_leaf': [2,5,8],
-                             'clf__min_samples_split': [2,5,8],
-                             'clf__n_estimators': [800,1200],
+                            {'clf__max_depth': [15],
+                             'clf__max_features': [None],
+                             'clf__min_samples_leaf': [2],
+                             'clf__min_samples_split': [2],
+                             'clf__n_estimators': [1200],
                              'features__word2vec__vectorizer__vectorizer': ['ft'],
                              'select': [None],
                              'upsample': [None]}
@@ -155,9 +155,9 @@ def grid_search(data=labeled_data_df,
                               'features__word2vec__vectorizer__vectorizer':['ft'],
                               'upsample':[None],
                               'select': [None],
-                              'clf__n_estimators':[800,1200],
-                              'clf__learning_rate':[0.0001, 0.001, 0.01, 0.1, 0.2, 0.3],
-                              'clf__max_depth':[3,5,8,10,15,30],
+                              'clf__n_estimators':[1200],
+                              'clf__learning_rate':[0.1],
+                              'clf__max_depth':[3],
                               'clf__max_features':['sqrt'],
                             }
                            ]
@@ -168,10 +168,10 @@ def grid_search(data=labeled_data_df,
                               'features__word2vec__vectorizer__vectorizer':['ft'],
                               'upsample':[None],
                               'select': [None],
-                              'clf__C':[.001,.01,.1,1.0,10,100],
+                              'clf__C':[.001],
                               'clf__penalty':['l2'],
-                              'clf__loss':['hinge','squared_hinge'],
-                              'clf__class_weight':[None,'balanced']
+                              'clf__loss':['squared_hinge'],
+                              'clf__class_weight':['balanced']
                             }
                         ]
 
@@ -181,9 +181,9 @@ def grid_search(data=labeled_data_df,
                               'features__word2vec__vectorizer__vectorizer':['ft'],
                               'upsample':[None],
                               'select': [None],
-                              'clf__penalty':['l2','l1'],
-                              'clf__C':[100,10,1.0,.1,.01,.001],
-                              'clf__class_weight':[None,'balanced']
+                              'clf__penalty':['l2'],
+                              'clf__C':[.01],
+                              'clf__class_weight':['balanced']
                             }
                         ]
         elif "SGD" in clf_name:
@@ -192,10 +192,10 @@ def grid_search(data=labeled_data_df,
                               'features__word2vec__vectorizer__vectorizer':['ft'],
                               'upsample':[None],
                               'select': [None],
-                              'clf__penalty':['l2','l1'],
-                              'clf__loss':['hinge','modified_huber'],
-                              'clf__alpha':[1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3],
-                              'clf__class_weight':[None,'balanced']
+                              'clf__penalty':['l2'],
+                              'clf__loss':['modified_huber'],
+                              'clf__alpha':[1e0],
+                              'clf__class_weight':[None]
                             }
                         ]
 

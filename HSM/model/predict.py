@@ -12,7 +12,7 @@ import sys
 import numpy as np
 from math import sin, cos, pi
 import warnings
-from text_utils import NormalizeText
+from model.text_utils import NormalizeText
 
 warnings.filterwarnings('ignore')
 
@@ -108,6 +108,7 @@ class ClassifyNewData():
         writer = pd.ExcelWriter(results_path)
         new_data.to_excel(writer,'Classification Results',index=False)
         writer.save()
+
 
 db_path = os.path.join("/Users",'scottmcallister','Desktop','GitHub','10x-qualitative-data','HSM','db','db.csv')
 nd = ClassifyNewData(db_path,'Value')
