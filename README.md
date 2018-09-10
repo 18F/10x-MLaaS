@@ -12,8 +12,8 @@ Before you can run the script, you'll need the following assets:
  - the training data as `train.csv` placed here: `HSM/model/training_data/train.csv` 
  - and a list of profanity placed here: `model/corpora/profanity.csv`. 
 
-Once you've got those assets (and all of the Python dependencies) you're ready to run `python app.py`. Here's what will hapen when you do:
- - Loads the word embeddings used to vectorize the text. 
+Once you've got those assets (and all of the Python dependencies) you're ready to run `python app.py`. Here's what will happen when you do:
+ - Loads the word embeddings used to vectorize the text. If you don't already have them locally, it'll download them. The binary file is about 900MB, so it takes a couple minutes.
  - Gets survey responses from the Qualtrics API using the latest responseId on hand. If you don't have any responses yet, then you're running this for the first time and it'll download all of the responses to-date, placing them in `db.csv`
  - Trains a ham-spam classifier if you don't already have one (takes about 15 minutes)
  - Uses the classifier to predict on the new data you've just downloaded, writing results to an excel file for review
