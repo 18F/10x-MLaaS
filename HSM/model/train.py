@@ -1,291 +1,324 @@
-import dill as pickle
-import pandas as pd
-import warnings
+import contractions
+import numpy as np
+import re
 import os
-import sys
+import pandas as pd
+import numpy as np
+import nltk
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import wordnet as wn
+from nltk.corpus import stopwords
+from scipy import stats
+from bs4 import BeautifulSoup
 from sklearn import metrics
-from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.pipeline import FeatureUnion
-from sklearn.ensemble import GradientBoostingClassifier, ExtraTreesClassifier
-from sklearn.feature_selection import SelectPercentile, f_classif
-from sklearn.linear_model import SGDClassifier, LogisticRegression
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import LinearSVC
+from sklearn.feature_selection import SelectPercentile
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.linear_model import SGDClassifier
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.dummy import DummyClassifier
 #in order to use SMOTE, you've got to import Pipeline from imblearn
 from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
-from model.transformers import ColumnExtractor, OrdinalTransformer, CharLengthExtractor, DateTransformer, TfidfEmbeddingVectorizer
-from model.text_utils import NormalizeText
-
+import dill as pickle
+import warnings
 warnings.filterwarnings('ignore')
+
+class log_uniform():
+    """
+    Provides an instance of the log-uniform distribution with an .rvs() method.
+    Meant to be used with RandomizedSearchCV, particularly for hyperparams like
+    alpha, C, gamma, etc.
+
+    Attributes:
+        a (int or float): the exponent of the beginning of the range and
+        b (int or float): the exponent of the end of range.
+        base (int or float): the base of the logarithm. 10 by default.
+    """
+
+    def __init__(self, a=-1, b=0, base=10):
+        self.loc = a
+        self.scale = b - a
+        self.base = base
+
+    def rvs(self, size=1, random_state=None):
+        uniform = stats.uniform(loc=self.loc, scale=self.scale)
+        return np.power(self.base,
+                        uniform.rvs(size=size,
+                                    random_state=random_state))
 
 
 class TrainClassifer():
     """
     Description:
-        This class will train a model depending on the comment_question you
-        pass into it during initialization.
+        This class will train a model depending for the site-wide survey.
     Attributes:
-        comment_question (str): choose one of the following as a shorthand
-                                for the page-level survey comment questions:
-                                Value, Other Purpose of Visit, Purpose of Visit,
-                                 Unable to Complete Purpose Reason.
         metric (str): the classifier scoring metric to use. Choose from:
         accuracy, roc_auc, precision, fbeta, or recall. Note that for fbeta,
         beta = 2.
     """
 
-    def __init__(self,comment_question,metric='roc_auc'):
-        self.comment_question = comment_question
+    def __init__(self,metric='roc_auc'):
         self.metric = metric
 
 
-    def prepare_train(self):
+    @staticmethod
+    def clean(doc):
+        """
+        Prepares text for NLP by stripping html tags; replacing urls with 'url';
+        and replacing email addresses with 'email'. It also expands contractions
+        and lowercases everything. Finally, it only keeps words that are at least
+        three characters long, do not contain a number, and are no more than
+        17 chars long.
 
-        ordinal_questions = ["Experience Rating",
-                             "Likely to Return",
-                             "Likely to Recommend",
-                             "Able to Accomplish"
-                             ]
-        labeled_data_path = os.path.join('model','training_data','train.csv')
-        labeled_data_df = pd.read_csv(labeled_data_path,encoding='latin1')
-        labeled_data_df[self.comment_question] = labeled_data_df[self.comment_question].astype(str)
+        Arguments:
+            doc (str): A single document within the corpus.
+
+        Returns:
+            normalized (str): The normalized string.
+        """
+
+
+        def strip_html_tags(text):
+            """
+            Strips html tags from a string.
+            """
+
+            soup = BeautifulSoup(text, "html.parser")
+            stripped_text = soup.get_text()
+            return stripped_text
+
+        def strip_urls(text):
+            """
+            Replaces urls in a string with 'url'.
+            """
+
+            url_re = re.compile(r"""(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))""")
+            text = url_re.sub('url',text)
+            return text
+
+        def strip_emails(text):
+            """
+            Replaces email addresses in a string with 'email'.
+            """
+
+            email_re = re.compile(r'\S+@\S+')
+            text = email_re.sub('email',text)
+            return text
+
+        def strip_nonsense(text):
+            """
+            Returns words from a string that are at least 3 characters long, do not contain a number, and
+            are no more than 17 chars long.
+            """
+
+            no_nonsense = re.findall(r'\b[a-z][a-z][a-z]+\b',text)
+            text = ' '.join(w for w in no_nonsense if w != 'nan' and len(w) <= 17)
+            return text
+
+        def expand_contractions(text, contraction_mapping=contractions.contractions_dict):
+            """
+            Expands contractions within a string. For example, can't becomes cannot.
+            """
+
+            contractions_pattern = re.compile('({})'.format('|'.join(contraction_mapping.keys())),
+                                                  flags=re.IGNORECASE|re.DOTALL)
+
+            def expand_match(contraction):
+                match = contraction.group(0)
+                first_char = match[0]
+                if contraction_mapping.get(match):
+                    expanded_contraction = contraction_mapping.get(match)
+                else:
+                    expanded_contraction = contraction_mapping.get(match.lower())
+                if expanded_contraction:
+                    expanded_contraction = first_char+expanded_contraction[1:]
+                    return expanded_contraction
+                else:
+                    pass
+
+            expanded_text = contractions_pattern.sub(expand_match, text)
+            expanded_text = re.sub("'", "", expanded_text)
+            return expanded_text
+
+        doc = doc.lower()
+        contraction_free = expand_contractions(doc)
+        tag_free = strip_html_tags(contraction_free)
+        url_free = strip_urls(tag_free)
+        email_free = strip_emails(url_free)
+        normalized = strip_nonsense(email_free)
+        return normalized
+
+
+    @staticmethod
+    def get_lemmas(document):
+        """
+        Lemmatizes the string of a single document after normalizing it with the
+        clean function.
+
+        Arguments:
+            document (str): A single document within the corpus.
+
+        Returns:
+            lemmas_str (str): A space-delimited string of lemmas. This can be
+                              passed into a word vectorizer, such as tf-idf.
+        """
+
+        def get_wordnet_pos(treebank_tag):
+            """
+            Converts the part of speech tag returned by nltk.pos_tag() to a value
+            that can be passed to the `pos` kwarg of wordnet_lemmatizer.lemmatize()
+            """
+
+            if treebank_tag.startswith('J'):
+                return wn.ADJ
+            elif treebank_tag.startswith('V'):
+                return wn.VERB
+            elif treebank_tag.startswith('N'):
+                return wn.NOUN
+            elif treebank_tag.startswith('R'):
+                return wn.ADV
+            else:
+                return wn.NOUN
+
+        stopword_set = set(stopwords.words('english'))
+        #using the clean function defined above here
+        text = word_tokenize(TrainClassifer.clean(document))
+        word_pos = nltk.pos_tag(text)
+        wordnet_lemmatizer = WordNetLemmatizer()
+        lemmas = []
+        for word, pos in word_pos:
+            pos = get_wordnet_pos(pos)
+            lemma = wordnet_lemmatizer.lemmatize(word,pos=pos)
+            if 'research' in lemma:
+                lemmas.append('research')
+            elif 'dataset' in lemma:
+                lemmas.append('dataset')
+            else:
+                lemmas.append(lemma)
+        lemmas_list = [lemma for lemma in lemmas if lemma not in stopword_set]
+        lemmas_str = " ".join(lemma for lemma in lemmas)
+        return lemmas_str
+
+
+    def prepare_train(self):
+        labeled_data_path = os.path.join('model',
+                                         'training_data',
+                                         'training-sw.xlsx')
+        train_df = pd.read_excel(labeled_data_path)
         print("\tNormalizing the text...")
-        nt = NormalizeText()
-        normalized_text = nt.transform(labeled_data_df[self.comment_question])
-        labeled_data_df['Normalized '+self.comment_question] = normalized_text
+        # normalize the comments, preparing for tf-idf
+        train_df['Normalized Comments'] = train_df['Comments Concatenated'].astype(str).apply(TrainClassifer.get_lemmas)
         print("\tDone normalizing the text.")
         print("_"*80)
-        return labeled_data_df
+        return train_df
 
 
-    def grid_search(self,data):
+    def randomized_grid_search(self,
+                               train_df,
+                               clf=SGDClassifier(),
+                               n_iter_search = 10,#10 for testing purposes
+                               pickle_best=True):
         """
-            Description:
-                Given the survey dataset where a comment column has already been
-                normalized, split the data into training and test subsets; apply
-                custom transformers for feature extraction; and gridsearch
-                the following models:  ExtraTreesClassifier(),
-                GradientBoostingClassifier(), SGDClassifier(),
-                LogisticRegression(), and LinearSVC().
+        Given labeled training data (`df`) for a binary classification task,
+        performs a randomized grid search `n_iter_search` times using `clf` as the
+        classifier and the `score` as a scoring metric.
 
-            Parameters:
-                data:  the pandas dataframe containing the survey responses as
-                       well as two new columns containing binary encoding of
-                       spam vs ham and the normalized comment.
-                normalized_comment_col:  the str name of the normalized comment
-                                         column in data.
-                comment_col:  the str name of the comment column in data.
-                label_col:  the str name of the column containing the class
-                            labels.
-                date_col:  the str name of the datetime column in data.
-                scoring_metric:  The scoring metric to be used when refitting
-                                the models. 'roc_auc' by default.
+        Attributes:
+            df (pandas DataFrame):  The training data. Currently, you must specify
+                                    within the function the label and feature column
+                                    names.
+            clf (instance of an sklearn classifier):  SGDClassifier() by default
+            n_iter_search:  number of parameter settings that are sampled. Trades
+                            off runtime vs quality of the solution.
+            pickle_best (bool): whether or not to pickle the best estimator
+                                returned by the grid search. Default is True
         """
-        normalized_comment_col = "Normalized " + self.comment_question
-        comment_col = self.comment_question
-        label_col = self.comment_question + " Spam"
-        date_col = "EndDate"
-        scoring_metric = self.metric
-        ordinal_questions = ["Experience Rating",
-                             "Likely to Return",
-                             "Likely to Recommend",
-                             "Able to Accomplish"
-                             ]
-        X = data.drop(label_col, axis =1)
-        y = data[label_col]
-        X_train, X_test, y_train, y_test = train_test_split(X, y,
-                                                            test_size=0.1,
-                                                            random_state=123)
-        classifiers = [SGDClassifier(),
-                       ExtraTreesClassifier(),
-                       GradientBoostingClassifier(),
-                       LogisticRegression(),
-                       LinearSVC()]
+        score = self.metric
         scoring = {'accuracy': metrics.make_scorer(metrics.accuracy_score),
                    'roc_auc': metrics.make_scorer(metrics.roc_auc_score),
                    'precision': metrics.make_scorer(metrics.average_precision_score),
-                   'fbeta':metrics.make_scorer(metrics.fbeta_score,beta=2),
+                   'fbeta':metrics.make_scorer(metrics.fbeta_score,beta=1.5),
                    'recall':metrics.make_scorer(metrics.recall_score)}
-        results = {k:None for k in [clf.__class__.__name__ for clf in classifiers]}
-        for clf in classifiers:
-            print('=' * 80)
-            clf_name = clf.__class__.__name__
-            print("Training {}...".format(clf_name))
-            print('=' * 80)
-            pipe = Pipeline([
-                             ('features', FeatureUnion([
-                                         ('word2vec', Pipeline([
-                                                           ('extractor', ColumnExtractor(cols=[normalized_comment_col],
-                                                                                      dtype='str')),
-                                                           ('vectorizer', TfidfEmbeddingVectorizer())
-                                         ])),
-                                         ('comment_length', Pipeline([
-                                                           ('extractor',ColumnExtractor(cols=[comment_col],
-                                                                                        dtype='str')),
-                                                           ('num_chars', CharLengthExtractor())
-                                         ])),
-                                         ('ordinal', Pipeline([
-                                                            ('extract', ColumnExtractor(cols = ordinal_questions,
-                                                                                        dtype='str')),
-                                                            ('ordinal_enc', OrdinalTransformer(cols = ordinal_questions))
-                                         ])),
-                                         ('datetime', Pipeline([
-                                                           ('extract', ColumnExtractor(cols = [date_col],
-                                                                                       dtype='datetime')),
-                                                           ('date_transform', DateTransformer())
-                                         ])),
-                             ])),
-                            ('scaler', StandardScaler(with_mean=False)),
-                            ('upsample', SMOTE()),
-                            ('select', SelectPercentile(f_classif)),
-                            ('clf', clf)])
+        clf_name = clf.__class__.__name__
+        X = train_df['Normalized Comments']
+        y = train_df['Spam']
+        X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                            test_size=0.25,
+                                                            random_state=123)
+        pipe = Pipeline([
+                         ('vectorizer',TfidfVectorizer()),
+                         ('upsample',SMOTE()),
+                         ('select',SelectPercentile()),
+                         ('clf', clf)])
+        param_dist = {
+                      "vectorizer__ngram_range":[(1,1), (1,2), (1,3)],
+                      "vectorizer__min_df":stats.randint(1,3),
+                      "vectorizer__max_df":stats.uniform(.7,.3),
+                      "vectorizer__sublinear_tf":[True, False],
+                      "upsample":[None,
+                                  SMOTE(ratio='minority',kind='svm'),
+                                  SMOTE(ratio='minority',kind='regular'),
+                                  SMOTE(ratio='minority',kind='borderline1'),
+                                  SMOTE(ratio='minority',kind='borderline2')],
+                      "select":[None,
+                                SelectPercentile(percentile=10),
+                                SelectPercentile(percentile=20),
+                                SelectPercentile(percentile=50),
+                                SelectPercentile(percentile=75)],
+                      "clf__alpha": log_uniform(-5,2),
+                      "clf__penalty": ['l2','l1','elasticnet'],
+                      "clf__loss": ['hinge', 'log', 'modified_huber', 'squared_hinge', 'perceptron'],
+                      }
 
-            if "Extra" in clf_name:
-                param_grid = [
-                                {'clf__max_depth': [15],
-                                 'clf__max_features': [None],
-                                 'clf__min_samples_leaf': [2],
-                                 'clf__min_samples_split': [2],
-                                 'clf__n_estimators': [1200],
-                                 'features__word2vec__vectorizer__vectorizer': ['ft'],
-                                 'select': [None],
-                                 'upsample': [None]}
-                               ]
-            elif 'Gradient' in clf_name:
-                param_grid = [
-                                {
-                                  'features__word2vec__vectorizer__vectorizer':['ft'],
-                                  'upsample':[None],
-                                  'select': [None],
-                                  'clf__n_estimators':[1200],
-                                  'clf__learning_rate':[0.1],
-                                  'clf__max_depth':[3],
-                                  'clf__max_features':['sqrt'],
-                                }
-                               ]
-            elif "Linear" in clf_name:
-                param_grid = [
-                                {
-                                  'features__word2vec__vectorizer__vectorizer':['ft'],
-                                  'upsample':[None],
-                                  'select': [None],
-                                  'clf__C':[.001],
-                                  'clf__penalty':['l2'],
-                                  'clf__loss':['squared_hinge'],
-                                  'clf__class_weight':['balanced']
-                                }
-                            ]
-            elif "Logistic" in clf_name:
-                param_grid = [
-                                {
-                                  'features__word2vec__vectorizer__vectorizer':['ft'],
-                                  'upsample':[None],
-                                  'select': [None],
-                                  'clf__penalty':['l2'],
-                                  'clf__C':[.01],
-                                  'clf__class_weight':['balanced']
-                                }
-                            ]
-            elif "SGD" in clf_name:
-                param_grid = [
-                                {
-                                  'features__word2vec__vectorizer__vectorizer':['ft'],
-                                  'upsample':[None],
-                                  'select': [None],
-                                  'clf__penalty':['l2'],
-                                  'clf__loss':['modified_huber'],
-                                  'clf__alpha':[1e0],
-                                  'clf__class_weight':[None]
-                                }
-                            ]
-            gs = GridSearchCV(pipe, param_grid = param_grid, scoring = scoring,
-                              refit = scoring_metric,
-                              n_jobs = -1, verbose = True, cv = 5,
-                              return_train_score = False)
-            gs.fit(X_train, y_train)
-            best_score = gs.best_score_
-            best_params = gs.best_params_
-            y_pred = gs.predict(X_test)
-            #get the col number of the positive class (i.e. spam)
-            positive_class_col = list(gs.classes_).index(1)
-            try:
-                y_score = gs.predict_proba(X_test)[:,positive_class_col]
-            except AttributeError:
-                y_score = gs.decision_function(X_test)
-            average_precision = metrics.average_precision_score(y_test, y_score)
-            acc = metrics.accuracy_score(y_test,y_pred)
-            roc_auc = metrics.roc_auc_score(y_test, y_pred)
-            precisions, recalls, _ = metrics.precision_recall_curve(y_test, y_score)
-            auc = metrics.auc(recalls, precisions)
-            # beta > 1 favors recall
-            fbeta = metrics.fbeta_score(y_test,y_pred,beta=2)
-            recall = metrics.recall_score(y_test,y_pred)
-            best_estimator = gs.best_estimator_
-
-            results[clf_name] = (precisions, recall, average_precision,
-                                 acc, roc_auc, auc, fbeta, recalls, best_params,
-                                 best_score, best_estimator)
-
-            print("Best score on training data:  {0:.2f}".format(gs.best_score_))
-            print("\tRecall on test data:  {0:.2f}".format(recall))
-            print("\tAccuracy on test data:  {0:.2f}".format(acc))
-            print("\tROC-AUC on test data:  {0:.2f}".format(roc_auc))
-            print("\tFbeta on test data:  {0:.2f}".format(fbeta))
-            print("\tAverage Precision on test data:  {0:.2f}".format(average_precision))
-            print("\tPrecision-Recall AUC on test data:  {0:.2f}".format(auc))
-            print(f"\tBest estimator:{best_estimator}")
-            print(f"\tBest params:{best_params}")
-
+        random_search = RandomizedSearchCV(pipe, param_distributions=param_dist,
+                                           scoring=scoring, refit=score,
+                                           n_iter=n_iter_search, cv=5,n_jobs=-1,
+                                           verbose=1)
+        random_search.fit(X_train, y_train)
+        y_pred = random_search.predict(X_test)
+        #get the col number of the positive class (i.e. spam)
+        positive_class_col = list(random_search.classes_).index(1)
+        try:
+            y_score = random_search.predict_proba(X_test)[:,positive_class_col]
+        except AttributeError:
+            y_score = random_search.decision_function(X_test)
+        average_precision = metrics.average_precision_score(y_test, y_score)
+        acc = metrics.accuracy_score(y_test,y_pred)
+        roc_auc = metrics.roc_auc_score(y_test, y_pred)
+        precisions, recalls, _ = metrics.precision_recall_curve(y_test, y_score)
+        auc = metrics.auc(recalls, precisions)
+        fbeta = metrics.fbeta_score(y_test,y_pred,beta=1.5)
+        recall = metrics.recall_score(y_test,y_pred)
+        print("\tRecall on test data:  {0:.2f}".format(recall))
+        print("\tAccuracy on test data:  {0:.2f}".format(acc))
+        print("\tROC-AUC on test data:  {0:.2f}".format(roc_auc))
+        print("\tFbeta on test data:  {0:.2f}".format(fbeta))
+        print("\tAverage Precision on test data:  {0:.2f}".format(average_precision))
+        print("\tPrecision-Recall AUC on test data:  {0:.2f}".format(auc))
+        print("-"*80)
+        print("Classification Report:")
+        class_names = ['ham', 'spam']
+        print(metrics.classification_report(y_test,
+                                            y_pred,
+                                            target_names=class_names))
+        best_estimator = random_search.best_estimator_
+        best_score = random_search.best_score_
+        result_values = [y_pred, y_score, precisions, recall, average_precision,
+                         acc, roc_auc, auc, fbeta, recalls, best_score, best_estimator, y_test]
+        result_keys = ['y_pred', 'y_score', 'precisions', 'recall', 'average_precision','acc',
+                       'roc_auc', 'auc', 'fbeta', 'recalls','best_score','best_estimator','y_test']
+        results = {k:v for k,v in zip(result_keys,result_values)}
+        if pickle_best:
+            pickle_dir = os.path.join(os.getcwd(),'model','best_estimators')
+            if not os.path.exists(pickle_dir):
+                os.makedirs(pickle_dir)
+            pickle_path = os.path.join(pickle_dir,'model_sw.pkl')
+            with open(pickle_path, 'wb') as f:
+                pickle.dump(random_search.best_estimator_, f)
         return results
 
-
-    def pickle_model(self,results):
-        metric=self.metric
-        print("Pickling the best model...")
-        #get the classifier scores depending on metric
-        if metric == 'accuracy':
-            best_scores = [results[k][3] for k in results.keys()]
-        elif metric == 'precision':
-            best_scores = [results[k][2] for k in results.keys()]
-        elif metric == 'fbeta':
-            best_scores = [results[k][6] for k in results.keys()]
-        elif metric == 'roc_auc':
-            best_scores = [results[k][4] for k in results.keys()]
-        elif metric == 'recall':
-            best_scores = [results[k][1] for k in results.keys()]
-        #find the index of the max score, which corresponds to the classifier
-        index_max = max(range(len(best_scores)), key=best_scores.__getitem__)
-        best_model_name = list(results.keys())[index_max]
-        #look up the best_estimator
-        best_model = results[best_model_name][-1]
-        pickle_dir = os.path.join(os.getcwd(),'model','best_estimators')
-        if not os.path.exists(pickle_dir):
-            os.makedirs(pickle_dir)
-        pickle_file = os.path.join(pickle_dir,
-                                   f'{self.comment_question}_{metric}_best_estimator.pkl')
-        with open(pickle_file, 'wb') as f:
-            pickle.dump(best_model, f)
-        print("Done pickling the best model.")
-
-
-    def show_clf_report(self,results):
-        metric=self.metric
-        # TODO: display different reports depending on metric
-        for k in results:
-            precisions = results[k][0]
-            average_precision = results[k][2]
-            recalls = results[k][7]
-
-            plt.figure(figsize=(8,6))
-            plt.step(recalls, precisions, color='b', alpha=0.2,
-                 where='post')
-            plt.fill_between(recalls, precisions, step='post', alpha=0.2,
-                             color='b')
-
-            plt.xlabel('Recall')
-            plt.ylabel('Precision')
-            plt.ylim([0.0, 1.05])
-            plt.xlim([0.0, 1.0])
-            plt.title('{} --- 2-class Precision-Recall curve'.format(k))
-            plt.show()
+if __name__ == '__main__':
+    tc = TrainClassifer()
+    train_df = tc.prepare_train()
+    results = tc.randomized_grid_search(train_df)
