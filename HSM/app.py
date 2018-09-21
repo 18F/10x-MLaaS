@@ -6,6 +6,7 @@ import sys
 import time
 
 # Get the data from qualtrics
+print("-"*80)
 qa = qualtrics.QualtricsApi()
 qa.download_responses()
 qa.update_db()
@@ -32,7 +33,7 @@ else:
 print('-'*80)
 print("Making predictions on new data using the trained model...")
 db_path = os.path.join(os.getcwd(),'db','db.csv')
-nd = predict.ClassifyNewData(db_path,'Value')
+nd = predict.ClassifyNewData(db_path)
 nd.get_new_data()
 nd.predict()
 print("Done making predictions. You can find the results in ClassificationResults.xlsx")
