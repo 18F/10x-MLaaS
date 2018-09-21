@@ -13,12 +13,12 @@ qa.update_db()
 model_path = os.path.join(os.getcwd(),
                           'model',
                           'best_estimators',
-                          'Value_roc_auc_best_estimator.pkl')
+                          'model_sw.pkl')
 
 if os.path.exists(model_path):
     print("A trained model already exists, so let's use it!")
     db_path = os.path.join(os.getcwd(),'db','db.csv')
-    nd = predict.ClassifyNewData(db_path,'Value')
+    nd = predict.ClassifyNewData(db_path)
     nd.get_new_data()
     nd.predict()
     print("Done making predictions. You can find the results in ClassificationResults.xlsx")

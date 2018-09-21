@@ -226,3 +226,8 @@ class QualtricsApi:
             updated_db.to_csv(db_path, index=False)
         print("Done updating database with new Qualtrics data!")
         print("-"*80)
+
+if __name__ == '__main__':
+    qa = QualtricsApi()
+    qa.download_responses()
+    qa.update_db()
