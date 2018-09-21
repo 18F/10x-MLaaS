@@ -102,6 +102,7 @@ class QualtricsApi:
             print('Post Request to Qualtrics was a success!')
         else:
             print(status_code)
+            # TODO: log errors, including 500 status codes (see GH37)
             sys.exit(0)
         progressId = downloadRequestResponse.json()["result"]["id"]
 
@@ -225,3 +226,8 @@ class QualtricsApi:
             updated_db.to_csv(db_path, index=False)
         print("Done updating database with new Qualtrics data!")
         print("-"*80)
+
+if __name__ == '__main__':
+    qa = QualtricsApi()
+    qa.download_responses()
+    qa.update_db()
