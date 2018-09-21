@@ -102,6 +102,7 @@ class QualtricsApi:
             print('Post Request to Qualtrics was a success!')
         else:
             print(status_code)
+            # TODO: log errors, including 500 status codes (see GH37)
             sys.exit(0)
         progressId = downloadRequestResponse.json()["result"]["id"]
 
