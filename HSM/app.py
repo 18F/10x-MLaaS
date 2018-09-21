@@ -25,10 +25,9 @@ if os.path.exists(model_path):
     sys.exit(0)
 else:
     print("A trained model doesn't already exists, so let's train one now!")
-    tc = train.TrainClassifer(comment_question='Value')
-    labeled_data_df = tc.prepare_train()
-    results = tc.grid_search(labeled_data_df)
-    tc.pickle_model(results)
+    tc = train.TrainClassifer()
+    train_df = tc.prepare_train()
+    results = tc.randomized_grid_search(train_df)
 
 print('-'*80)
 print("Making predictions on new data using the trained model...")
