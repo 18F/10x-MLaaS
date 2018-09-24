@@ -20,7 +20,7 @@ class UpdateDb():
 
     def update_db(self):
         db_path = os.path.join('db','db.csv')
-        db_df = pd.read_csv(db_path)
+        db_df = pd.read_csv(db_path,encoding='latin1')
         if self.penultimateResponseId:
             idx = db_df.index[db['ResponseID'] == self.penultimateResponseId].tolist()[0]
             db_df = db_df.iloc[idx+1:]
@@ -50,4 +50,4 @@ class UpdateDb():
         else:
             db_df['SPAM'] = db_df['ResponseID'].map(merged_id_pred_map)
 
-        db_df.to_csv(db_path,index=False)
+        db_df.to_csv(db_path,index=False,encoding='latin1')
