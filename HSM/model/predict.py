@@ -32,12 +32,12 @@ class ClassifyNewData():
         id_path = os.path.join(os.getcwd(),'pastResponseId.txt')
         try:
             with open(id_path,'r') as f:
-                    lines = f.read().splitlines()
-                    try:
-                        self.penultimateResponseId = lines[1]
-                    except IndexError:
-                        #if only 1 id, then there's no penultimate
-                        self.penultimateResponseId = None
+                lines = f.read().splitlines()
+                if len(lines) == 1:
+                    #if only 1 id, then None
+                    self.lastResponseId = None
+                else:
+                    self.lastResponseId = lines[0]
         except FileNotFoundError:
             print("Can't predict without data. Run qualtrics.py first.")
             sys.exit(0)
@@ -45,12 +45,14 @@ class ClassifyNewData():
 
     def get_new_data(self):
         db = pd.read_csv(self.db_path,encoding='latin1')
-        if self.penultimateResponseId:
-            idx = db.index[db['ResponseID'] == self.penultimateResponseId].tolist()[0]
+        if self.lastResponseId:
+            # get new responses using penultimateResponseId
+            lastResponseId = self.lastResponseId
+            idx = db.index[db['ResponseID'] == lastResponseId].tolist()[0]
             new_data = db.iloc[idx+1:]
         else:
             new_data = db
-        if db.size == 0:
+        if new_data.size == 0:
             print("No new data to predict on! Exiting the script. Try again later.")
             sys.exit(0)
         other_purpose = new_data['Other Purpose of Visit'].astype(str)

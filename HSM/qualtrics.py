@@ -139,7 +139,7 @@ class QualtricsApi:
                 if FilePath.endswith(".csv"):
                     #if it's the first csv, we'll need the column names
                     if csv_counter == 0:
-                        df = pd.read_csv(FilePath)
+                        df = pd.read_csv(FilePath,encoding='latin1')
                         # Get proper column names from first row
                         dfColumns = df.iloc[0].tolist()
                         df.columns = dfColumns
@@ -149,7 +149,7 @@ class QualtricsApi:
                         os.remove(FilePath)
                         csv_counter += 1
                     else:
-                        df = pd.read_csv(FilePath)
+                        df = pd.read_csv(FilePath,encoding='latin1')
                         df = df.iloc[2:]
                         dfs.append(df)
                         os.remove(FilePath)
@@ -189,14 +189,6 @@ class QualtricsApi:
                 col_rename_map[col] = col
         final_df = final_df.rename(col_rename_map,axis=1)
 
-
-        # Create new columns
-        final_df['Download Date'] = pd.Timestamp.now()
-        final_df['Value Spam'] = 1
-        final_df['Purpose Spawm'] = 1
-        final_df['Complete Spam'] = 1
-        final_df['Other Spam'] = 1
-
         try:
             lastResponseId = final_df['ResponseID'].iat[-1]
 
@@ -218,12 +210,12 @@ class QualtricsApi:
         db_path = os.path.join(db_dir,'db.csv')
         if not os.path.exists(db_dir):
             os.makedirs(db_dir)
-            final_df.to_csv(db_path, index=False)
+            final_df.to_csv(db_path, index=False, encoding='latin1')
         else:
-            db = pd.read_csv(db_path)
+            db = pd.read_csv(db_path, encoding='latin1')
             updated_db = pd.concat([db,final_df])
             updated_db = updated_db.drop_duplicates(subset='ResponseID')
-            updated_db.to_csv(db_path, index=False)
+            updated_db.to_csv(db_path, index=False, encoding='latin1')
         print("Done updating database with new Qualtrics data!")
         print("-"*80)
 
