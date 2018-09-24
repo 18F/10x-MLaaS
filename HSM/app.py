@@ -42,7 +42,7 @@ else:
     print("A trained model doesn't already exists, so let's train one now!")
     tc = train.TrainClassifer()
     train_df = tc.prepare_train()
-    results = tc.randomized_grid_search(train_df)
+    results = tc.randomized_grid_search(train_df,n_iter_search=500)
 
 print('-'*80)
 print("Making predictions on new data using the trained model...")
