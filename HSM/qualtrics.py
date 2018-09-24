@@ -189,14 +189,6 @@ class QualtricsApi:
                 col_rename_map[col] = col
         final_df = final_df.rename(col_rename_map,axis=1)
 
-
-        # Create new columns
-        final_df['Download Date'] = pd.Timestamp.now()
-        final_df['Value Spam'] = 1
-        final_df['Purpose Spawm'] = 1
-        final_df['Complete Spam'] = 1
-        final_df['Other Spam'] = 1
-
         try:
             lastResponseId = final_df['ResponseID'].iat[-1]
 
