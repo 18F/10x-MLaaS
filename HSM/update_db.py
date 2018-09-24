@@ -8,23 +8,28 @@ class UpdateDb():
         id_path = 'pastResponseId.txt'
         try:
             with open(id_path,'r') as f:
-                    lines = f.read().splitlines()
-                    try:
-                        self.penultimateResponseId = lines[1]
-                    except IndexError:
-                        #if only 1 id, then there's no penultimate
-                        self.penultimateResponseId = None
+                lines = f.read().splitlines()
+                if len(lines) == 1:
+                    #if only 1 id, then None
+                    self.lastResponseId = None
+                else:
+                    self.lastResponseId = lines[0]
         except FileNotFoundError:
-            self.penultimateResponseId = None
+            self.lastResponseId = None
 
 
     def update_db(self):
         db_path = os.path.join('db','db.csv')
         db_df = pd.read_csv(db_path,encoding='latin1')
-        if self.penultimateResponseId:
-            idx = db_df.index[db['ResponseID'] == self.penultimateResponseId].tolist()[0]
-            db_df = db_df.iloc[idx+1:]
-        db_id_pred_map = dict(zip(db_df['ResponseID'], db_df['SPAM']))
+        if self.lastResponseId:
+            lastResponseId = self.lastResponseId
+            idx = db_df.index[db_df['ResponseID'] == lastResponseId].tolist()[0]
+            new_db_df = db_df.iloc[idx+1:]
+            db_id_pred_map = dict(zip(new_db_df['ResponseID'], db_df['SPAM']))
+        else:
+            new_db_df = db_df
+            db_id_pred_map = dict(zip(new_db_df['ResponseID'], db_df['SPAM']))
+
         results_path = os.path.join('model','results','ClassificationResults.xlsx')
         results_df = pd.read_excel(results_path)
         validated_id_pred_map = dict(zip(results_df['ResponseID'],
@@ -41,13 +46,17 @@ class UpdateDb():
                 if k not in db_id_pred_map:
                     print(f"This ResponseID isn't in the db:  {f}.")
                     print("You shold probably look into this.")
-            db_df['SPAM'] = db_df['ResponseID'].map(merged_id_pred_map)
+            new_db_df['SPAM'] = new_db_df['ResponseID'].map(merged_id_pred_map)
         elif num_merged_ids < num_db_ids:
             print("The number of merged ids is less than the number of ids in the db.")
             print(f"This will fill {num_db_ids-num_merged_ids} ids with nan!")
             print("Exiting script")
             sys.exit(0)
         else:
-            db_df['SPAM'] = db_df['ResponseID'].map(merged_id_pred_map)
+            new_db_df['SPAM'] = new_db_df['ResponseID'].map(merged_id_pred_map)
 
-        db_df.to_csv(db_path,index=False,encoding='latin1')
+        if self.lastResponseId:
+            concat_db = pd.concat([new_db_df,db_df])
+            concat_db.to_csv(db_path,index=False,encoding='latin1')
+        else:
+            new_db_df.to_csv(db_path,index=False,encoding='latin1')
