@@ -54,11 +54,11 @@ class TrainClassifer():
         This class will train a model depending for the site-wide survey.
     Attributes:
         metric (str): the classifier scoring metric to use. Choose from:
-        accuracy, roc_auc, precision, fbeta, or recall. Note that for fbeta,
+        accuracy, roc_auc, avg_precision, fbeta, or recall. Note that for fbeta,
         beta = 2.
     """
 
-    def __init__(self,metric='roc_auc'):
+    def __init__(self,metric='avg_precision'):
         self.metric = metric
 
 
@@ -234,10 +234,11 @@ class TrainClassifer():
             pickle_best (bool): whether or not to pickle the best estimator
                                 returned by the grid search. Default is True
         """
+
         score = self.metric
         scoring = {'accuracy': metrics.make_scorer(metrics.accuracy_score),
                    'roc_auc': metrics.make_scorer(metrics.roc_auc_score),
-                   'precision': metrics.make_scorer(metrics.average_precision_score),
+                   'avg_precision': metrics.make_scorer(metrics.average_precision_score),
                    'fbeta':metrics.make_scorer(metrics.fbeta_score,beta=1.5),
                    'recall':metrics.make_scorer(metrics.recall_score)}
         clf_name = clf.__class__.__name__
