@@ -5,14 +5,10 @@ import io
 import os
 import sys
 import pandas as pd
-from time import sleep, strftime
-import subprocess
-import stat
-import warnings
+from time import sleep
 import json
-
-warnings.filterwarnings('ignore')
-
+from config import qualtrics_sitewide_creds
+import db
 
 class QualtricsApi:
     """Query Qualtrics API for new survey responses and then write to database.
@@ -20,43 +16,28 @@ class QualtricsApi:
     Attributes:
         apiToken (str): a Qualtrics API token.
         surveyId (str): the survey id.
-        fileFormat (str): the preferred file format. Only 'csv' is possible now.
+        fileFormat (str): the preferred file format. Only 'json' is possible now.
         dataCenter (str): the datacenter from the hostname of the qualtrics
                           account url
-        SurveyResponsePath (str): the directory name to dump the responses
     """
 
-    def __init__(self,
-                 apiToken=None,
-                 surveyId=None,
-                 fileFormat='csv',
-                 dataCenter='cemgsa',
-                 SurveyResponsePath='survey_responses'):
-        print("Getting data from Qualtrics.")
+    def __init__(self, last_response_id, apiToken=None, surveyId=None, fileFormat='json', 
+                 dataCenter='cemgsa'):
+        print("Getting data from Qualtrics...")
         if not apiToken and not surveyId:
-            with open('secrets.json','r') as f:
-                loaded_json = json.loads(f.read())
-                apiToken = loaded_json['apiToken']
-                surveyId = loaded_json['surveyId']
+            apiToken = qualtrics_sitewide_creds['apiToken']
+            surveyId = qualtrics_sitewide_creds['surveyId']
 
         self.apiToken = apiToken
         self.surveyId = surveyId
         self.fileFormat = fileFormat
         self.dataCenter = dataCenter
-        if not os.path.exists(SurveyResponsePath):
-            os.makedirs(SurveyResponsePath)
-        self.SurveyResponsePath = SurveyResponsePath
-        try:
-            with open('pastResponseId.txt','r') as f:
-                line_list = f.read().splitlines()
-                try:
-                    self.lastResponseId = line_list[0]
-                    self.penultimateResponseId = line_list[1]
-                except IndexError:
-                    self.penultimateResponseId = self.lastResponseId
-        except FileNotFoundError:
-            self.lastResponseId = None
-            self.penultimateResponseId = None
+        if not last_response_id:
+            db.create_postgres_db()
+            db.dal.connect()
+            session = db.dal.Session()
+            last_response_id = db.fetch_last_RespondentID(session)
+        self.lastResponseId = last_response_id
 
 
     def download_responses(self):
@@ -120,106 +101,22 @@ class QualtricsApi:
                                             headers=headers, stream=True)
 
         # Step 4: Unzipping the file
-        zipfile.ZipFile(io.BytesIO(requestDownload.content)).extractall(self.SurveyResponsePath)
-        print('Merging downloaded Qualtrics data...')
+        with open("RequestFile.zip", "wb") as f:
+            for chunk in requestDownload.iter_content(chunk_size=1024):
+                f.write(chunk)
+        zipfile.ZipFile("RequestFile.zip").extractall("temp")
+        os.remove("RequestFile.zip")
 
-    def update_db(self):
+    
+    def get_data(self):
         """
-        Void function that walks through the response directory and concatenates
-        (i.e. vertically stacks) all of the csv survey responses before writing
-        to a single csv. Deletes the individual csvs after.
+        Convert the json into a pandas dataframe
         """
-
-        dfs = []
-        for subdir, dirs, files in os.walk(self.SurveyResponsePath):
-            for f in files:
-                FilePath = os.path.join(subdir, f)
-
-                csv_counter = 0
-                if FilePath.endswith(".csv"):
-                    #if it's the first csv, we'll need the column names
-                    if csv_counter == 0:
-                        df = pd.read_csv(FilePath,encoding='latin1')
-                        # Get proper column names from first row
-                        dfColumns = df.iloc[0].tolist()
-                        df.columns = dfColumns
-                        # Drop first two rows since they contain column info
-                        df = df.iloc[2:]
-                        dfs.append(df)
-                        os.remove(FilePath)
-                        csv_counter += 1
-                    else:
-                        df = pd.read_csv(FilePath,encoding='latin1')
-                        df = df.iloc[2:]
-                        dfs.append(df)
-                        os.remove(FilePath)
-                        csv_counter += 1
-                else:
-                    pass
-
-        concat_df = pd.concat(dfs)
-        # There are two ResponseID columns. Drop the second one
-        cols = concat_df.columns
-        second_id_i = [i for i,n in enumerate(cols) if n == 'ResponseID'][1]
-        col_indices = [i for i,c in enumerate(cols) if i != second_id_i]
-        final_df = concat_df.iloc[:, col_indices]
-
-        # Rename some columns to something shorter
-        col_rename_map = {k:None for k in final_df}
-        for col in col_rename_map:
-            if 'experience' in col:
-                col_rename_map[col] = "Experience Rating"
-            elif 'primary purpose' in col:
-                col_rename_map[col] = "Purpose of Visit"
-            elif 'few words' in col:
-                col_rename_map[col] = "Other Purpose of Visit"
-            elif 'able to accomplish' in col:
-                col_rename_map[col]  = "Able to Accomplish"
-            elif 'fully complete' in col:
-                col_rename_map[col] = "Unable to Complete Purpose Reason"
-            elif 'value most' in col:
-                col_rename_map[col] = "Value"
-            elif 'how we helped' in col:
-                col_rename_map[col] = "Purpose"
-            elif 'likely are you to return' in col:
-                col_rename_map[col] = "Likely to Return"
-            elif 'likely are you to recommend' in col:
-                col_rename_map[col] = "Likely to Recommend"
-            else:
-                col_rename_map[col] = col
-        final_df = final_df.rename(col_rename_map,axis=1)
-
-        try:
-            lastResponseId = final_df['ResponseID'].iat[-1]
-
-            filename = 'pastResponseId.txt'
-            if os.path.exists(filename):
-                append_write = 'a' # append id if file already exists
-                with open(filename,append_write) as f:
-                    f.write(lastResponseId + "\n")
-            else:
-                append_write = 'w' # make a new file if it doesn't exist
-                with open(filename,append_write) as f:
-                    f.write(lastResponseId + "\n")
-        except IndexError:
-            print("No new survey responses to download!")
-            sys.exit(0)
-
-        # create or append to master db
-        db_dir = os.path.join(os.getcwd(),f'db')
-        db_path = os.path.join(db_dir,'db.csv')
-        if not os.path.exists(db_dir):
-            os.makedirs(db_dir)
-            final_df.to_csv(db_path, index=False, encoding='latin1')
-        else:
-            db = pd.read_csv(db_path, encoding='latin1')
-            updated_db = pd.concat([db,final_df])
-            updated_db = updated_db.drop_duplicates(subset='ResponseID')
-            updated_db.to_csv(db_path, index=False, encoding='latin1')
-        print("Done updating database with new Qualtrics data!")
-        print("-"*80)
-
-if __name__ == '__main__':
-    qa = QualtricsApi()
-    qa.download_responses()
-    qa.update_db()
+        file_name = os.path.join(os.getcwd(),'temp','USAgov Official Sitewide Survey.json')
+        with open(file_name) as f:
+            data = json.load(f)
+        df = pd.DataFrame(data['responses'])
+        #replace np.nan with None so sql insertions don't insert 'nan' strings
+        df = df.where(pd.notnull(df), None)
+        os.remove(file_name)
+        return df    
