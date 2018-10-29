@@ -143,3 +143,4 @@ $RECYCLE.BIN/
 *.bin
 *.txt
 secrets.json
+config.py
