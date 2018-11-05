@@ -7,8 +7,8 @@ import sys
 import pandas as pd
 from time import sleep
 import json
-from config import qualtrics_sitewide_creds
-from db import db, db_utils
+from utils.config import qualtrics_sitewide_creds
+from utils import db, db_utils
 
 class QualtricsApi:
     """Query Qualtrics API for new survey responses and then write to database.
@@ -119,5 +119,9 @@ class QualtricsApi:
         #replace np.nan with None so sql insertions don't insert 'nan' strings
         df = df.where(pd.notnull(df), None)
         os.remove(file_name)
-        
-        return df    
+        df_n_rows = df.shape[0]
+        if df_n_rows > 0:
+            return df
+        else:
+            print("No new survey responses to download. Exiting")
+            sys.exit(0) 

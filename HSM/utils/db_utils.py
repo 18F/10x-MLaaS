@@ -1,7 +1,7 @@
 import pandas as pd
-from db_config import SQLALCHEMY_URI
+from utils.config import SQLALCHEMY_URI
 from sqlalchemy_utils import database_exists, create_database
-from db import Survey, Question, SurveyQuestion, Respondent, Response, Model, Version, Prediction, VersionPrediction, Validation
+from utils.db import Survey, Question, SurveyQuestion, Respondent, Response, Model, Version, Prediction, VersionPrediction, Validation
 from sqlalchemy import desc, func,  create_engine
 
 
@@ -9,12 +9,8 @@ def create_postgres_db():
     connection_string = SQLALCHEMY_URI
     engine = create_engine(connection_string, echo=False)
     if not database_exists(engine.url):
-        print("Database doesn't exist, creating now...")
         create_database(engine.url)
-        print("Done creating postgresql database.")
-    else:
-        print("Database already exists!")
-    
+        
 
 def survey_exists(survey_name, survey_questions, session):
     survey_names = []

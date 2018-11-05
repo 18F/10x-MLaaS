@@ -1,10 +1,6 @@
-from qualtrics import qualtrics
-import validate
+from utils import qualtrics, validate, db, db_utils
 import os
-import pandas as pd
 from model import predict, train
-from db import db, db_utils
-import sys
 import time
 
 

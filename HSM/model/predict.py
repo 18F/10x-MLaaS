@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import dill as pickle
 import sys
-from train import TrainClassifer
+from model.train import TrainClassifer
 
 
 

@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey, Table, Text, \
                        Date, Boolean, Sequence, DateTime
 from sqlalchemy.orm import relationship, sessionmaker
-from db_config import SQLALCHEMY_URI
+from utils.config import SQLALCHEMY_URI
 
 Base = declarative_base()
 
