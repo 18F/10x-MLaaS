@@ -1,4 +1,4 @@
-import qualtrics
+from qualtrics import qualtrics
 import validate
 import os
 import pandas as pd

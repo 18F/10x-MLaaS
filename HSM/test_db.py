@@ -2,7 +2,7 @@ import unittest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db.db_utils import fetch_concatenated_comments, prep_test_db
-from HSM.config import SQLALCHEMY_URI
+from db.db_config import SQLALCHEMY_URI
 
 
 # global application scope.  create Session class, engine

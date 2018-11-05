@@ -1,5 +1,5 @@
 import pandas as pd
-from HSM.config import SQLALCHEMY_URI
+from db_config import SQLALCHEMY_URI
 from sqlalchemy_utils import database_exists, create_database
 from db import Survey, Question, SurveyQuestion, Respondent, Response, Model, Version, Prediction, VersionPrediction, Validation
 from sqlalchemy import desc, func,  create_engine
