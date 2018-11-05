@@ -141,6 +141,5 @@ $RECYCLE.BIN/
 *.csv
 *.pkl
 *.bin
-*.txt
 secrets.json
 config.py
