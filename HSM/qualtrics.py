@@ -8,7 +8,7 @@ import pandas as pd
 from time import sleep
 import json
 from config import qualtrics_sitewide_creds
-import db
+from db import db, db_utils
 
 class QualtricsApi:
     """Query Qualtrics API for new survey responses and then write to database.
@@ -33,10 +33,10 @@ class QualtricsApi:
         self.fileFormat = fileFormat
         self.dataCenter = dataCenter
         if not last_response_id:
-            db.create_postgres_db()
+            db_utils.create_postgres_db()
             db.dal.connect()
             session = db.dal.Session()
-            last_response_id = db.fetch_last_RespondentID(session)
+            last_response_id = db_utils.fetch_last_RespondentID(session)
         self.lastResponseId = last_response_id
 
 
@@ -119,4 +119,5 @@ class QualtricsApi:
         #replace np.nan with None so sql insertions don't insert 'nan' strings
         df = df.where(pd.notnull(df), None)
         os.remove(file_name)
+        
         return df    
