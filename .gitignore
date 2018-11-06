@@ -139,7 +139,5 @@ $RECYCLE.BIN/
 # Data files
 *.xlsx
 *.csv
-*.pkl
 *.bin
-secrets.json
-config.py
+
