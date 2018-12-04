@@ -14,8 +14,14 @@ services:
             - web_nw
     postgres:
         image: "postgres:9.6.5"
+        environment:
+            - POSTGRES_USER=hsm
+            - POSTGRES_PASSWORD=hsm
+            - POSTGRES_DB=hsm-db
+            - POSTGRES_PORT=5432
         networks:
             - db_nw
+        restart: always 
 networks:
   db_nw:
     driver: bridge
