@@ -1,0 +1,23 @@
+version: '3'
+services:
+    web:
+        build: .
+        tty: true
+        ports:
+            - "5000:5000"
+        volumes:
+            - .:/home/hsm
+        depends_on:
+            - postgres
+        networks:
+            - db_nw
+            - web_nw
+    postgres:
+        image: "postgres:9.6.5"
+        networks:
+            - db_nw
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
