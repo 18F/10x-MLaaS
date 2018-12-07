@@ -1,6 +1,5 @@
 ![MlaaS](https://i.postimg.cc/vZDzYQb2/mlaas2.jpg)
 # 10x Machine Learning as a Service
----
 [Formerly known as Qualitative Data Management]
 
 We are currently in the **third phase of [10x](tenx): Development**. We estimate this phase to last approximately 6 months and will end in May 2019.
