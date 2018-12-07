@@ -29,8 +29,9 @@ Team members:
 
 Advisers:
 
-- David Kaufmann, USAgov Analytics, [Office of Products and Platforms](https://www.gsa.gov/about-us/organization/federal-acquisition-service/technology-transformation-services/office-of-products-and-programs)
-- Marybeth Murphy, USAgov Analytics, [Office of Products and Platforms](https://www.gsa.gov/about-us/organization/federal-acquisition-service/technology-transformation-services/office-of-products-and-programs)
+- David Kaufmann, USAgov Analytics, [Office of Products and Platforms](opp)
+- Marybeth Murphy, USAgov Analytics, [Office of Products and Platforms](opp)
+- Scott McAllister, Data Scientist, [Office of Products and Platforms](opp)
 
 Former team members:
 - Chris Goranson, research, [18F](tenx)
@@ -80,3 +81,5 @@ This project is in the worldwide [public domain](LICENSE.md). As stated in [CONT
 [tts]: https://www.gsa.gov/about-us/organization/federal-acquisition-service/technology-transformation-services
 [tenx]: https://10x.gsa.gov
 [eighteenf]: https://18f.gsa.gov
+[opp]: https://www.gsa.gov/about-us/organization/federal-acquisition-service/technology-transformation-services/office-of-products-and-programs
+
