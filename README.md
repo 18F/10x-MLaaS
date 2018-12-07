@@ -67,7 +67,7 @@ See [CONTRIBUTING](CONTRIBUTING.md) for additional information.
 
 Join us in
 [#10x-mlaas](https://gsa-tts.slack.com/messages/C9QNC7STG) or [ask
-us a question](https://github.com/18F/10x-MLaaSw/issues/new).
+us a question](https://github.com/18F/10x-MLaaS/issues/new).
 
 
 ## Public domain
