@@ -87,6 +87,41 @@ Now that you're environment is set up, you can use `app.py` as a CLI tool. Here'
     - Return to your terminal and enter `y` to tell the script to wake up and continue.
 
  - Inserts the survey data along with model predictions and your validation into the database.
+
+
+
+### Alternate: Docker & Docker Compose
+
+#### Step 1 Install Docker
+
+https://docs.docker.com/compose/install/
+
+#### Step 2 Configure Environment Variables
+
+>```
+>$ cp sample.env .env
+>```
+
+Modify Qualtrics env variables:
+
+>```
+>$ export QUALTRICS_API_TOKEN=<token>
+>$ export QUALTRICS_SW_SURVEY_ID=<site_wide_survey_id>
+>```
+
+
+#### Step 3 Build & Run!  
+    
+>```
+>$ docker-compose up
+>```
+  
+(In another terminal)
+>```
+>$ docker exec --user hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py"
+>```
+
+
  
 ## TODO
  - log performance of the models (based on the ground truth established by the validation)

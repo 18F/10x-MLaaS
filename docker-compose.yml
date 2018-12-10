@@ -3,19 +3,24 @@ services:
     web:
         build: .
         tty: true
+        container_name: mlaas-web
         ports:
             - "5000:5000"
+        environment:
+            - DB_NAME=hsm-db
+            - DB_ADDR=mlaas-db
         env_file:
             - ./.env
         volumes:
             - .:/home/hsm
         depends_on:
-            - postgres
+            - db
         networks:
             - db_nw
             - web_nw
-    postgres:
+    db:
         image: "postgres:9.6.5"
+        container_name: mlaas-db
         environment:
             - POSTGRES_USER=hsm
             - POSTGRES_PASSWORD=hsm
