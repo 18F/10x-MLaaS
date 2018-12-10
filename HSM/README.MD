@@ -102,11 +102,13 @@ https://docs.docker.com/compose/install/
 >$ cp sample.env .env
 >```
 
-Modify Qualtrics env variables:
+Modify Qualtrics Env variables in `.env`:
 
 >```
->$ export QUALTRICS_API_TOKEN=<token>
->$ export QUALTRICS_SW_SURVEY_ID=<site_wide_survey_id>
+>$ vim .env
+>  
+>$ QUALTRICS_API_TOKEN=<token>
+>$ QUALTRICS_SW_SURVEY_ID=<site_wide_survey_id>
 >```
 
 
