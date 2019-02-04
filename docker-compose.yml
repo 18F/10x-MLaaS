@@ -1,0 +1,36 @@
+version: '3'
+services:
+    web:
+        build: .
+        tty: true
+        container_name: mlaas-web
+        ports:
+            - "5000:5000"
+        environment:
+            - DB_NAME=hsm-db
+            - DB_ADDR=mlaas-db
+        env_file:
+            - ./.env
+        volumes:
+            - .:/home/hsm
+        depends_on:
+            - db
+        networks:
+            - db_nw
+            - web_nw
+    db:
+        image: "postgres:9.6.5"
+        container_name: mlaas-db
+        environment:
+            - POSTGRES_USER=hsm
+            - POSTGRES_PASSWORD=hsm
+            - POSTGRES_DB=hsm-db
+            - POSTGRES_PORT=5432
+        networks:
+            - db_nw
+        restart: always 
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
