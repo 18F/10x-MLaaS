@@ -23,6 +23,10 @@ from imblearn.over_sampling import SMOTE
 import dill as pickle
 import warnings
 warnings.filterwarnings('ignore')
+nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
 
 class log_uniform():
     """
