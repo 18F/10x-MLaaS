@@ -11,10 +11,10 @@ class MakePredictions():
     def __init__(self, df, survey_type = 'sw'):
         self.df = df
         if survey_type == 'sw':
-            model_path = os.path.join(os.getcwd(),'model','best_estimators','model_sw.pkl')
+            model_path = os.path.join(os.getcwd(), 'HSM', 'model','best_estimators','model_sw.pkl')
             self.model = model_path
         else:
-            model_path = os.path.join(os.getcwd(),'model','best_estimators','model_sw.pkl')
+            model_path = os.path.join(os.getcwd(), 'HSM', 'model','best_estimators','model_sw.pkl')
             self.model = model_path
  
     
