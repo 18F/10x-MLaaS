@@ -119,7 +119,7 @@ Modify Qualtrics Env variables in `.env`:
   
 (In another terminal)
 >```
->$ docker exec --user hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py"
+>$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py"
 >```
 
 
