@@ -113,7 +113,7 @@ class QualtricsApi:
         Convert the json into a pandas dataframe
         """
         file_name = os.path.join(os.getcwd(),'temp','USAgov Official Sitewide Survey.json')
-        with open(file_name) as f:
+        with open(file_name, encoding='utf8') as f:
             data = json.load(f)
         df = pd.DataFrame(data['responses'])
         #replace np.nan with None so sql insertions don't insert 'nan' strings
