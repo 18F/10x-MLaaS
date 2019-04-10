@@ -24,7 +24,7 @@ dal = DataAccessLayer()
 class Survey(Base):
     __tablename__ = 'survey'
     
-    id = Column(Integer, primary_key = True)
+    id = Column(Integer, primary_key = True, index=True)
     name = Column(String(100))
     
     questions = relationship("SurveyQuestion", back_populates="survey")
@@ -33,7 +33,7 @@ class Survey(Base):
 class Question(Base):
     __tablename__ = 'question'
     
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     text = Column(String(1000))
     
     surveys = relationship("SurveyQuestion", back_populates="question")
@@ -45,8 +45,8 @@ class SurveyQuestion(Base):
     '''
     __tablename__ = 'survey_question'
     
-    survey_id = Column(Integer, ForeignKey('survey.id'), primary_key = True)
-    question_id = Column(Integer, ForeignKey('question.id'), primary_key = True)
+    survey_id = Column(Integer, ForeignKey('survey.id'), primary_key = True, index=True)
+    question_id = Column(Integer, ForeignKey('question.id'), primary_key = True, index=True)
     
     survey = relationship("Survey", back_populates="questions")
     question = relationship("Question", back_populates="surveys")
@@ -55,7 +55,8 @@ class SurveyQuestion(Base):
 class Respondent(Base):
     __tablename__ = 'respondent'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+    Asset_Click = Column(String(1000))
     Browser_Metadata_Q_1_TEXT = Column(String(1000))
     Browser_Metadata_Q_2_TEXT = Column(String(1000))
     Browser_Metadata_Q_3_TEXT = Column(String(1000))
@@ -98,7 +99,7 @@ class Respondent(Base):
 class Response(Base):
     __tablename__ = 'response'
     
-    id = Column(Integer, primary_key = True)
+    id = Column(Integer, primary_key = True, index=True)
     respondent_id = Column(Integer, ForeignKey('respondent.id'))
     survey_id = Column(Integer, ForeignKey('survey.id'))
     question_id = Column(Integer, ForeignKey('question.id'))
@@ -112,7 +113,7 @@ class Model(Base):
     
     __tablename__ = 'model'
     
-    id = Column(Integer, primary_key = True)
+    id = Column(Integer, primary_key = True, index=True)
     description = Column(String(100))
     
     versions = relationship("Version")
@@ -122,7 +123,7 @@ class Version(Base):
     
     __tablename__ = "version"
     
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     model_id = Column(Integer, ForeignKey('model.id'))
     description = Column(String(100))
     
@@ -133,7 +134,7 @@ class Prediction(Base):
     
     __tablename__ = 'prediction'
     
-    id = Column(Integer, primary_key = True)
+    id = Column(Integer, primary_key = True, index=True)
     prediction = Column(Integer)
     
     versions = relationship("VersionPrediction", back_populates="prediction")
@@ -145,10 +146,10 @@ class VersionPrediction(Base):
     '''
     __tablename__ = 'version_prediction'
 
-    model_id = Column(Integer, ForeignKey('model.id', primary_key = True))
-    version_id = Column(Integer, ForeignKey('version.id'), primary_key = True)
-    prediction_id = Column(Integer, ForeignKey('prediction.id'), primary_key = True)
-    response_id = Column(Integer, ForeignKey('response.id'), primary_key = True)
+    model_id = Column(Integer, ForeignKey('model.id', primary_key = True), index=True)
+    version_id = Column(Integer, ForeignKey('version.id'), primary_key = True, index=True)
+    prediction_id = Column(Integer, ForeignKey('prediction.id'), primary_key = True, index=True)
+    response_id = Column(Integer, ForeignKey('response.id'), primary_key = True, index=True)
 
     version = relationship("Version", back_populates="predictions")
     prediction = relationship("Prediction", back_populates="versions")
@@ -158,7 +159,7 @@ class Validation(Base):
     
     __tablename__ = 'validation'
     
-    id = Column(Integer, primary_key = True)
+    id = Column(Integer, primary_key = True, index=True)
     validation = Column(Integer)
     
     responses = relationship("Response")

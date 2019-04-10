@@ -110,8 +110,10 @@ def main(survey_name = "Site-Wide Survey English", model_description = "model_sw
     results_path, df, id_pred_map = make_predictions(df)
     user_prompt()
     validated_id_pred_map = get_validations(results_path)
+
     insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_description, session)
     session.commit()
+    print("DONE!")
 
 if __name__ == '__main__':
     main()
