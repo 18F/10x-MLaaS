@@ -113,7 +113,6 @@ def insert_responses(df, survey_questions, survey_name, model_description, sessi
     model_id, version_id = fetch_model_version_ids(model_description, session)
     
     for i in range(df.shape[0]):
-        print(i)
         if (i % 250) == 0:
             session.commit()
             session.flush()
