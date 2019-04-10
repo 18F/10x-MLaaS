@@ -91,12 +91,14 @@ class QualtricsApi:
         while requestCheckProgress < 100:
             sleep(2)
             requestCheckUrl = baseUrl + progressId
+            print(requestCheckUrl)
             requestCheckResponse = requests.request("GET", requestCheckUrl, headers=headers)
             requestCheckProgress = requestCheckResponse.json()["result"]["percentComplete"]
             print("Download is " + str(requestCheckProgress) + " complete")
 
         # Step 3: Downloading file
         requestDownloadUrl = baseUrl + progressId + '/file'
+        print(requestDownloadUrl)
         requestDownload = requests.request("GET", requestDownloadUrl,
                                             headers=headers, stream=True)
 

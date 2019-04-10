@@ -29,14 +29,15 @@ class MakePredictions():
         df['Normalized Comments'] = df['Comments_Concatenated'].apply(TrainClassifer().get_lemmas)
         X = df['Normalized Comments']
         response_ids = df['ResponseID']
+        dates = df['EndDate']
  
-        return X, response_ids
+        return X, response_ids, dates
 
 
     def predict(self):
         with open(self.model, 'rb') as f:
             pickled_model = pickle.load(f)
-        X, response_ids = self.prepare_data()
+        X, response_ids, dates = self.prepare_data()
         preds = pickled_model.predict(X)
         dec_func = pickled_model.decision_function(X)
         labeled_data_df = pd.DataFrame(X)
@@ -44,6 +45,7 @@ class MakePredictions():
         labeled_data_df['SPAM'] = preds
         labeled_data_df['Decision Boundary Distance'] = abs(dec_func)
         labeled_data_df['ResponseID'] = response_ids
+        labeled_data_df['Date'] = dates
         results_dir = os.path.join(os.getcwd(),'model','results')
         if not os.path.exists(results_dir):
             os.makedirs(os.path.join(results_dir))
