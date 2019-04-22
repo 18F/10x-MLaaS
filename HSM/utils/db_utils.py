@@ -69,6 +69,8 @@ def prediction_exists(prediction_set, session):
     
 def insert_respondents(df, respondent_attributes, session):
     for i in range(df.shape[0]):
+        if (i % 1000) == 0:
+            session.commit()
         data = df.iloc[i][respondent_attributes]
         respondent_data = {k:v for k,v in zip(respondent_attributes, data)}
         respondent = Respondent(**respondent_data)
@@ -111,31 +113,35 @@ def insert_responses(df, survey_questions, survey_name, model_description, sessi
     model_id, version_id = fetch_model_version_ids(model_description, session)
     
     for i in range(df.shape[0]):
+        if (i % 250) == 0:
+            # Commit in batches.
+            session.commit()
+            session.flush()
         data = df.iloc[i][survey_questions+['ResponseID','prediction','validated prediction']]
         respondent_id = fetch_respondent_id(data['ResponseID'], session)
         validation = int(data['validated prediction'])
         validation_id = fetch_validation_id(validation, session)
         pred = int(data['prediction'])
-        prediction_id = fetch_prediction_id(pred, session)
-        prediction = session.query(Prediction).get(prediction_id)
-        val = session.query(Validation).get(validation_id)
+        #prediction_id = fetch_prediction_id(pred, session)
+        #prediction = session.query(Prediction).get(prediction_id)
+        #val = session.query(Validation).get(validation_id)
         for q in survey_questions:
             question_id = fetch_question_id(q, session)
             response = Response(survey_id = survey_id,
                                 question_id = question_id,
                                 respondent_id = respondent_id, 
                                 text=data[q])
-            val.responses.append(response)
+            #val.responses.append(response)
             session.add(response)
-            session.flush()
-            response_id = response.id
-            version_prediction = VersionPrediction()
-            version_prediction.model_id = model_id
-            version_prediction.version_id = version_id
-            version_prediction.prediction_id = prediction_id
-            version_prediction.response_id = response_id
-            version_prediction.prediction = prediction
-            session.add(version_prediction)   
+            # response_id = response.id
+            # version_prediction = VersionPrediction()
+            # version_prediction.model_id = model_id
+            # version_prediction.version_id = version_id
+            # version_prediction.prediction_id = prediction_id
+            # version_prediction.response_id = response_id
+            # version_prediction.prediction = prediction
+            # session.add(version_prediction)
+        session.commit()
 
 
 def fetch_last_RespondentID(session):
