@@ -25,19 +25,20 @@ class MakePredictions():
         value = df['Q6'].astype(str)
         purpose = df['Q3'].astype(str)
         comments_concatenated = other_purpose+" "+unable_complete+" "+value+" "+purpose
+        comments_original = "Q3: " + purpose + "\n Q5: " + other_purpose + "\n Q6: " + value + "\n Q7: " + unable_complete
         df['Comments_Concatenated'] = comments_concatenated.apply(lambda x: x.strip())
         df['Normalized Comments'] = df['Comments_Concatenated'].apply(TrainClassifer().get_lemmas)
         X = df['Normalized Comments']
         response_ids = df['ResponseID']
         dates = df['EndDate']
  
-        return X, response_ids, dates
+        return X, response_ids, dates, comments_original
 
 
     def predict(self):
         with open(self.model, 'rb') as f:
             pickled_model = pickle.load(f)
-        X, response_ids, dates = self.prepare_data()
+        X, response_ids, dates, comments_original = self.prepare_data()
         preds = pickled_model.predict(X)
         dec_func = pickled_model.decision_function(X)
         labeled_data_df = pd.DataFrame(X)
@@ -46,6 +47,7 @@ class MakePredictions():
         labeled_data_df['Decision Boundary Distance'] = abs(dec_func)
         labeled_data_df['ResponseID'] = response_ids
         labeled_data_df['Date'] = dates
+        labeled_data_df['Original Survey Responses'] = comments_original
         results_dir = os.path.join(os.getcwd(),'model','results')
         if not os.path.exists(results_dir):
             os.makedirs(os.path.join(results_dir))

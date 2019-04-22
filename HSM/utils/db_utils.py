@@ -114,6 +114,7 @@ def insert_responses(df, survey_questions, survey_name, model_description, sessi
     
     for i in range(df.shape[0]):
         if (i % 250) == 0:
+            # Commit in batches.
             session.commit()
             session.flush()
         data = df.iloc[i][survey_questions+['ResponseID','prediction','validated prediction']]
@@ -140,6 +141,7 @@ def insert_responses(df, survey_questions, survey_name, model_description, sessi
             # version_prediction.response_id = response_id
             # version_prediction.prediction = prediction
             # session.add(version_prediction)
+        session.commit()
 
 
 def fetch_last_RespondentID(session):
