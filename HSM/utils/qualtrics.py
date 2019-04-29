@@ -65,6 +65,7 @@ class QualtricsApi:
                   }
         # Step 1: Creating Data Export
         downloadRequestUrl = baseUrl
+        print(downloadRequestUrl)
         # Include lastResponseId in payload if provided during init
         if self.lastResponseId:
             downloadRequestPayload = '{"format":"' + self.fileFormat + \
