@@ -108,7 +108,7 @@ def main(survey_name = "Site-Wide Survey English", model_description = "model_sw
     session = db.dal.Session()
     df = get_survey_data(session)
     results_path, df, id_pred_map, outfile = make_predictions(df)
-    user_prompt()
+    user_prompt(outfile)
     validated_id_pred_map = get_validations(results_path)
 
     insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_description, session)
