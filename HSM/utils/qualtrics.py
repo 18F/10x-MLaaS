@@ -80,6 +80,16 @@ class QualtricsApi:
                                                    headers=headers)
 
         status_code = downloadRequestResponse.json()['meta']['httpStatus']
+
+        if '400' in status_code:
+            # Try without last request ID.
+            downloadRequestPayload = '{"format":"' + self.fileFormat + \
+                                     '","surveyId":"' + self.surveyId + '"}'
+            downloadRequestResponse = requests.request("POST",downloadRequestUrl,
+                                                   data=downloadRequestPayload,
+                                                   headers=headers)
+            status_code = downloadRequestResponse.json()['meta']['httpStatus']
+            
         if '200' in status_code:
             print('Post Request to Qualtrics was a success!')
         else:
