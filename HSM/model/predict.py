@@ -2,8 +2,6 @@ import os
 import pandas as pd
 import dill as pickle
 import sys
-from utils.config import question_ids, survey_id
-from datetime import datetime
 from model.train import TrainClassifer
 
 
@@ -22,23 +20,22 @@ class MakePredictions():
     
     def prepare_data(self):
         df = self.df
-        comments_concatenated = ''
-        comments_original = ''
-        for q in question_ids:
-            comments_concatenated = comments_concatenated + " " + df[q].astype(str)
-            comments_original = comments_original + "\n{}: ".format(q) + df[q].astype(str)
-
+        other_purpose = df['Q5'].astype(str)
+        unable_complete = df['Q7'].astype(str)
+        value = df['Q6'].astype(str)
+        purpose = df['Q3'].astype(str)
+        comments_concatenated = other_purpose+" "+unable_complete+" "+value+" "+purpose
+        comments_original = "Q3: " + purpose + "\n Q5: " + other_purpose + "\n Q6: " + value + "\n Q7: " + unable_complete
         df['Comments_Concatenated'] = comments_concatenated.apply(lambda x: x.strip())
         df['Normalized Comments'] = df['Comments_Concatenated'].apply(TrainClassifer().get_lemmas)
         X = df['Normalized Comments']
         response_ids = df['ResponseID']
         dates = df['EndDate']
-
+ 
         return X, response_ids, dates, comments_original
 
 
     def predict(self):
-        outfile = 'ClassificationResults_{}_{}.xlsx'.format(survey_id, datetime.utcnow().strftime('%Y%m%d'))
         with open(self.model, 'rb') as f:
             pickled_model = pickle.load(f)
         X, response_ids, dates, comments_original = self.prepare_data()
@@ -54,7 +51,7 @@ class MakePredictions():
         results_dir = os.path.join(os.getcwd(),'model','results')
         if not os.path.exists(results_dir):
             os.makedirs(os.path.join(results_dir))
-        results_path = os.path.join(results_dir, outfile)
+        results_path = os.path.join(results_dir, 'ClassificationResults.xlsx')
         writer = pd.ExcelWriter(results_path)
         labeled_data_df.to_excel(writer, 'Classification Results', index=False)
         writer.save()
@@ -62,4 +59,4 @@ class MakePredictions():
                                labeled_data_df['SPAM']))
         df = self.df.drop(labels=['Normalized Comments'], axis = 1)
 
-        return results_path, df, id_pred_map, outfile
+        return results_path, df, id_pred_map
