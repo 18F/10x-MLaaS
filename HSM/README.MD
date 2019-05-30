@@ -3,7 +3,7 @@
 
 ## Getting Started
 
-### Step 1: Setup Local Machine.
+### Step 1: Install & Configure PostgresSQL
 
 #### Step 1.1:  Install Homebrew
 You don't have to install homebrew in order to install postgres. But it's by far the easiest approach.
@@ -17,10 +17,10 @@ Before you install anything with Homebrew, you should always make sure it's up t
 
 ### Step 2: Clone the Repository
 Navigate to where you'd like to clone the repo. Then clone it:
->`$ git clone https://github.com/18F/10x-MLaaS.git`
+>`$ git clone https://github.com/18F/10x-qualitative-data.git`
 
 Now `cd` into the repository you've just cloned:
->`$ cd 10x-MLaaS`
+>`$ cd 10x-qualitative-data`
 
 
 ### Run with Docker & Docker Compose
@@ -41,7 +41,6 @@ Modify Qualtrics Env variables in `.env`:
 ># In ~/10x-MLaaS/.env
 >QUALTRICS_API_TOKEN=<token>
 >QUALTRICS_SW_SURVEY_ID=<site_wide_survey_id>
->QUALTRICS_SURVEY_QUESTION_IDS=<comma separated list of text question fields to analyze>
 >```
 
 
