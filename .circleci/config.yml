@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Start Container
+          command: |
+            docker-compose up -d
+      - run: 
+          name: HSM test suite
+          command: |
+            docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "cd HSM;python -m unittest tests/test_db.py"
+
+      - run:
+          name: Flake8
+          command: |
+            pip install -r requirements-dev.txt
+            flake8
