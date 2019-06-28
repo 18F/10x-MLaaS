@@ -1,14 +1,13 @@
 import requests
 import zipfile
 import json
-import io
 import os
 import sys
 import pandas as pd
 from time import sleep
-import json
 from utils.config import qualtrics_sitewide_creds
 from utils import db, db_utils
+
 
 class QualtricsApi:
     """Query Qualtrics API for new survey responses and then write to database.
@@ -21,7 +20,7 @@ class QualtricsApi:
                           account url
     """
 
-    def __init__(self, last_response_id, apiToken=None, surveyId=None, fileFormat='json', 
+    def __init__(self, last_response_id, apiToken=None, surveyId=None, fileFormat='json',
                  dataCenter='cemgsa'):
         print("Getting data from Qualtrics...")
         if not apiToken and not surveyId:
@@ -38,7 +37,6 @@ class QualtricsApi:
             session = db.dal.Session()
             last_response_id = db_utils.fetch_last_RespondentID(session)
         self.lastResponseId = last_response_id
-
 
     def download_responses(self):
         """
@@ -60,8 +58,9 @@ class QualtricsApi:
         # Setting static parameters
         requestCheckProgress = 0
         baseUrl = "https://{0}.gov1.qualtrics.com/API/v3/responseexports/".format(self.dataCenter)
-        headers = {"content-type": "application/json",
-                   "x-api-token": self.apiToken,
+        headers = {
+                    "content-type": "application/json",
+                    "x-api-token": self.apiToken,
                   }
         # Step 1: Creating Data Export
         downloadRequestUrl = baseUrl
@@ -74,7 +73,7 @@ class QualtricsApi:
             downloadRequestPayload = '{"format":"' + self.fileFormat + \
                                      '","surveyId":"' + self.surveyId + '"}'
 
-        downloadRequestResponse = requests.request("POST",downloadRequestUrl,
+        downloadRequestResponse = requests.request("POST", downloadRequestUrl,
                                                    data=downloadRequestPayload,
                                                    headers=headers)
 
@@ -100,7 +99,7 @@ class QualtricsApi:
         requestDownloadUrl = baseUrl + progressId + '/file'
         print(requestDownloadUrl)
         requestDownload = requests.request("GET", requestDownloadUrl,
-                                            headers=headers, stream=True)
+                                           headers=headers, stream=True)
 
         # Step 4: Unzipping the file
         with open("RequestFile.zip", "wb") as f:
@@ -109,21 +108,21 @@ class QualtricsApi:
         zipfile.ZipFile("RequestFile.zip").extractall("temp")
         os.remove("RequestFile.zip")
 
-    
     def get_data(self):
         """
         Convert the json into a pandas dataframe
         """
-        file_name = os.path.join(os.getcwd(),'temp','USAgov Official Sitewide Survey.json')
+        file_name = os.path.join(os.getcwd(), 'temp', 'USAgov Official Sitewide Survey.json')
         with open(file_name, encoding='utf8') as f:
             data = json.load(f)
         df = pd.DataFrame(data['responses'])
-        #replace np.nan with None so sql insertions don't insert 'nan' strings
+        # replace np.nan with None so sql insertions don't insert 'nan' strings
         df = df.where(pd.notnull(df), None)
-        os.remove(file_name)
+        # os.remove(file_name)
         df_n_rows = df.shape[0]
+        # if number of rows more than zero
         if df_n_rows > 0:
             return df
         else:
             print("No new survey responses to download. Exiting")
-            sys.exit(0) 
+            sys.exit(0)
