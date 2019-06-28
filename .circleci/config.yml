@@ -22,4 +22,4 @@ jobs:
 
           name: Flake8
           command: |
-            docker  exec --user hsm -it mlaas-web /bin/bash -c "cd home/hsm/HSM;pip install -r requirements-dev.txt;flake8"
+            docker exec --user root -it mlaas-web /bin/bash -c "cd home/hsm/HSM;pip install -r requirements-dev.txt;flake8"
