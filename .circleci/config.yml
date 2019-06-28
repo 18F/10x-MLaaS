@@ -9,6 +9,10 @@ jobs:
           command: |
             docker-compose up -d
 
+      - run:
+          name: Wait for dependencies to finish installing
+          command: |
+            sleep 30
       - run: 
           name: HSM test suite
           command: |
