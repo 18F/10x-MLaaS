@@ -13,13 +13,18 @@ jobs:
           name: Wait for dependencies to finish installing
           command: |
             sleep 30
+
+      - run:
+          name: Install Dev Dependencies
+          command: |
+            docker exec --user root -it mlaas-web /bin/bash -c "cd home/hsm/HSM;pip install -r requirements-dev.txt"
+
       - run: 
           name: HSM test suite
           command: |
             docker exec --user hsm -it mlaas-web /bin/bash -c "cd home/hsm/HSM;python -m unittest tests/test_db.py"
 
       - run:
-
           name: Flake8
           command: |
-            docker exec --user root -it mlaas-web /bin/bash -c "cd home/hsm/HSM;pip install -r requirements-dev.txt;flake8"
+            docker exec --user hsm -it mlaas-web /bin/bash -c "cd home/hsm/HSM;flake8"
