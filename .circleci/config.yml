@@ -8,8 +8,6 @@ jobs:
           name: Start Container
           command: |
             docker-compose up -d
-      - run:
-          name: Install Development Dependencies
 
       - run: 
           name: HSM test suite
