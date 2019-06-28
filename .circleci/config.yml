@@ -8,12 +8,16 @@ jobs:
           name: Start Container
           command: |
             docker-compose up -d
+      - run:
+          name: Install Development Dependencies
+
       - run: 
           name: HSM test suite
           command: |
-            docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "cd HSM;python -m unittest tests/test_db.py"
+            docker exec --user hsm -it mlaas-web /bin/bash -c "cd /home/hsm;python -m unittest tests/test_db.py"
 
       - run:
+
           name: Flake8
           command: |
             pip install -r requirements-dev.txt
