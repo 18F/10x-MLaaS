@@ -12,11 +12,10 @@ jobs:
       - run: 
           name: HSM test suite
           command: |
-            docker exec --user hsm -it mlaas-web /bin/bash -c "cd /home/hsm;python -m unittest tests/test_db.py"
+            docker exec --user hsm -it mlaas-web /bin/bash -c "cd home/hsm/HSM;python -m unittest tests/test_db.py"
 
       - run:
 
           name: Flake8
           command: |
-            pip install -r requirements-dev.txt
-            flake8
+            docker  exec --user hsm -it mlaas-web /bin/bash -c "cd home/hsm/HSM;pip install -r requirements-dev.txt;flake8"
