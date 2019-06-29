@@ -1,16 +1,17 @@
 import unittest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.db_utils import fetch_concatenated_comments, prep_test_db
-from db.db_config import SQLALCHEMY_URI
+# from utils.config import SQLALCHEMY_URI
 
 
 # global application scope.  create Session class, engine
 Session = sessionmaker()
 
-engine = create_engine(SQLALCHEMY_URI)
+engine = create_engine("sqlite://")
+
 
 class SomeTest(unittest.TestCase):
+
     def setUp(self):
         # connect to the database
         self.connection = engine.connect()
@@ -24,7 +25,7 @@ class SomeTest(unittest.TestCase):
     def test_something(self):
         # use the session in tests.
 
-        self.session.add(Foo())
+        # self.session.add(Foo())
         self.session.commit()
 
     def tearDown(self):
