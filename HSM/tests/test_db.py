@@ -1,13 +1,13 @@
 import unittest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from utils.config import SQLALCHEMY_URI
+# from utils.config import SQLALCHEMY_URI
 
 
 # global application scope.  create Session class, engine
 Session = sessionmaker()
 
-engine = create_engine(SQLALCHEMY_URI)
+engine = create_engine("sqlite://")
 
 
 class SomeTest(unittest.TestCase):
