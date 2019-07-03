@@ -3,17 +3,7 @@
 
 ## Getting Started
 
-### Step 1: Install & Configure PostgresSQL
-
-#### Step 1.1:  Install Homebrew
-You don't have to install homebrew in order to install postgres. But it's by far the easiest approach.  To go to [brew's homepage](https://brew.sh/) to install.
-
-#### Step 1.2: Check Homebrew
-Before you install anything with Homebrew, you should always make sure it's up to date and that it's healthy:
->`$ brew update`<br>
->`$ brew doctor`
-
-### Step 2: Clone the Repository
+### Step 1: Clone the Repository
 Navigate to where you'd like to clone the repo. Then clone it:
 >`$ git clone https://github.com/18F/10x-MLaaS.git`
 
@@ -21,13 +11,13 @@ Now `cd` into the repository you've just cloned:
 >`$ cd 10x-MLaaS`
 
 
-### Run with Docker & Docker Compose
+### Step 2: Run with Docker & Docker Compose
 
-#### Step 1 Install Docker
+#### Step a: Install Docker (if you do not have docker already)
 
 https://docs.docker.com/compose/install/
 
-#### Step 2 Configure Environment Variables
+#### Step b: Configure Environment Variables
 
 >```
 >$ cp sample.env .env
