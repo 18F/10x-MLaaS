@@ -64,17 +64,17 @@ class QualtricsApi:
                   }
         # Step 1: Creating Data Export
         downloadRequestUrl = baseUrl
+        downloadRequestPayload = {
+                                    "format": self.fileFormat,
+                                    "surveyId": self.surveyId,
+                                    "useLabels": True
+                                 }
         # Include lastResponseId in payload if provided during init
         if self.lastResponseId:
-            downloadRequestPayload = '{"format":"' + self.fileFormat + \
-                                     '","surveyId":"' + self.surveyId + \
-                                     '","lastResponseId":"' + self.lastResponseId + '"}'
-        else:
-            downloadRequestPayload = '{"format":"' + self.fileFormat + \
-                                     '","surveyId":"' + self.surveyId + '"}'
+            downloadRequestPayload['lastResponseId'] = self.lastResponseId
 
         downloadRequestResponse = requests.request("POST", downloadRequestUrl,
-                                                   data=downloadRequestPayload,
+                                                   data=json.dumps(downloadRequestPayload),
                                                    headers=headers)
 
         status_code = downloadRequestResponse.json()['meta']['httpStatus']
@@ -118,7 +118,7 @@ class QualtricsApi:
         df = pd.DataFrame(data['responses'])
         # replace np.nan with None so sql insertions don't insert 'nan' strings
         df = df.where(pd.notnull(df), None)
-        # os.remove(file_name)
+        os.remove(file_name)
         df_n_rows = df.shape[0]
         # if number of rows more than zero
         if df_n_rows > 0:

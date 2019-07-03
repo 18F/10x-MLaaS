@@ -1,14 +1,12 @@
 # HSM
-`app.py` provides a command line interface for the Ham-Spam Machine (HSM). Currently, it only fethces and classifies responses to the **site-wide version** of the survey. It uses a local instance of a postgreSQL database, although it does allow the user to validate comment predictions in excel while the script is sleeping. 
+`app.py` provides a command line interface for the Ham-Spam Machine (HSM). Currently, it only fetches and classifies responses to the **site-wide version** of the survey. It uses a local instance of a postgreSQL database, although it does allow the user to validate comment predictions in excel while the script is sleeping.
 
 ## Getting Started
 
 ### Step 1: Install & Configure PostgresSQL
 
 #### Step 1.1:  Install Homebrew
-You don't have to install homebrew in order to install postgres. But it's by far the easiest approach.
-
->`$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+You don't have to install homebrew in order to install postgres. But it's by far the easiest approach.  To go to [brew's homepage](https://brew.sh/) to install.
 
 #### Step 1.2: Check Homebrew
 Before you install anything with Homebrew, you should always make sure it's up to date and that it's healthy:
@@ -17,10 +15,10 @@ Before you install anything with Homebrew, you should always make sure it's up t
 
 ### Step 2: Clone the Repository
 Navigate to where you'd like to clone the repo. Then clone it:
->`$ git clone https://github.com/18F/10x-qualitative-data.git`
+>`$ git clone https://github.com/18F/10x-MLaaS.git`
 
 Now `cd` into the repository you've just cloned:
->`$ cd 10x-qualitative-data`
+>`$ cd 10x-MLaaS`
 
 
 ### Run with Docker & Docker Compose
@@ -45,12 +43,13 @@ Modify Qualtrics Env variables in `.env`:
 
 
 #### Step 3 Build & Run!  
-    
+
+This will bring up the containers:
 >```
 >$ docker-compose up
 >```
   
-(In another terminal)
+(In another terminal).  This will run the application within `mlaas-web`:
 >```
 >$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py"
 >```

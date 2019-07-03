@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import dill as pickle
 from model.train import TrainClassifier
+from utils.config import FIELDS
 
 
 class MakePredictions():
@@ -47,12 +48,41 @@ class MakePredictions():
         labeled_data_df['ResponseID'] = response_ids
         labeled_data_df['Date'] = dates
         labeled_data_df['Original Survey Responses'] = comments_original
+
+        print("Combining all specified columns and prediction...")
+        print("Here's the list of available items to choose from the raw data:")
+        print(list(self.df))
+        print("Here's the list of available items to choose from the processed prediction data:")
+        print(list(labeled_data_df))
+        # Using Outer Join to get all the data even if there's missing info on one side
+        joined_df = pd.merge(self.df, labeled_data_df, on='ResponseID', how='outer')
+
+        # There are two SPAM columns, SPAM_x and SPAM_y, SPAM_x should be removed becauses it is an empty column
+        # Need to rename SPAM_y to SPAM
+        joined_df = joined_df.drop(columns='SPAM_x')
+        joined_df = joined_df.rename(columns={'SPAM_y': 'SPAM'})
+
+        # Try to figure out what is valid columns
+        valid_fields = [field for field in FIELDS if field in list(joined_df)]
+
+        if valid_fields != FIELDS:
+            invalid_fields = [field for field in FIELDS if field not in list(joined_df)]
+            print("Here is a list of fields that cannot be found in the data:")
+            print(invalid_fields)
+            print("Skipping them in the output...")
+
+        # Only pick out what the user wants to output
+        joined_df = joined_df[valid_fields]
+        print("Here is the final list of the valid user-choosen fields in the config.py file we are using.")
+        print(list(valid_fields))
+
         results_dir = os.path.join(os.getcwd(), 'model', 'results')
         if not os.path.exists(results_dir):
             os.makedirs(os.path.join(results_dir))
         results_path = os.path.join(results_dir, 'ClassificationResults.xlsx')
         writer = pd.ExcelWriter(results_path)
-        labeled_data_df.to_excel(writer, 'Classification Results', index=False)
+        # labeled_data_df.to_excel(writer, 'Classification Results', index=False)
+        joined_df.to_excel(writer, 'Classification Results', index=False)
         writer.save()
         id_pred_map = dict(zip(labeled_data_df['ResponseID'],
                                labeled_data_df['SPAM']))
