@@ -50,6 +50,8 @@ Now that you're environment is set up, you can use `app.py` as a CLI tool. Here'
  - Downloads data from the Qualtrics API. 
     - If it's your first time running this, it'll download all responses to-date. Otherwise it'll check the database for the last response and then only fetch new responses.
  - Feeds concatenated survey comments to a pre-trained `sklearn` classifer to predict spam (1) or ham (0)
+ - User can make changes to what fields to return as part of the outputting spreadsheet in utils/config.py
+   - Keep in mind that you should make sure `SPAM` and `Comment Concatentated` fields should be included for training purpose later.
  - Sleeps to give you time to review the predictions in  `HSM/model/results/ClassificationResults.xlsx`
     - When reviewing the results, the prediction is in the `SPAM` column (0 = ham and 1 = spam). 
     - Make your changes inplace, overwriting the prediction if you disagree.
