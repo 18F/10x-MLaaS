@@ -1,35 +1,23 @@
 # HSM
-`app.py` provides a command line interface for the Ham-Spam Machine (HSM). Currently, it only fethces and classifies responses to the **site-wide version** of the survey. It uses a local instance of a postgreSQL database, although it does allow the user to validate comment predictions in excel while the script is sleeping. 
+`app.py` provides a command line interface for the Ham-Spam Machine (HSM). Currently, it only fetches and classifies responses to the **site-wide version** of the survey. It uses a local instance of a postgreSQL database, although it does allow the user to validate comment predictions in excel while the script is sleeping.
 
 ## Getting Started
 
-### Step 1: Install & Configure PostgresSQL
-
-#### Step 1.1:  Install Homebrew
-You don't have to install homebrew in order to install postgres. But it's by far the easiest approach.
-
->`$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
-
-#### Step 1.2: Check Homebrew
-Before you install anything with Homebrew, you should always make sure it's up to date and that it's healthy:
->`$ brew update`<br>
->`$ brew doctor`
-
-### Step 2: Clone the Repository
+### Step 1: Clone the Repository
 Navigate to where you'd like to clone the repo. Then clone it:
->`$ git clone https://github.com/18F/10x-qualitative-data.git`
+>`$ git clone https://github.com/18F/10x-MLaaS.git`
 
 Now `cd` into the repository you've just cloned:
->`$ cd 10x-qualitative-data`
+>`$ cd 10x-MLaaS`
 
 
-### Run with Docker & Docker Compose
+### Step 2: Run with Docker & Docker Compose
 
-#### Step 1 Install Docker
+#### Step a: Install Docker (if you do not have docker already)
 
 https://docs.docker.com/compose/install/
 
-#### Step 2 Configure Environment Variables
+#### Step b: Configure Environment Variables
 
 >```
 >$ cp sample.env .env
@@ -45,12 +33,13 @@ Modify Qualtrics Env variables in `.env`:
 
 
 #### Step 3 Build & Run!  
-    
+
+This will bring up the containers:
 >```
 >$ docker-compose up
 >```
   
-(In another terminal)
+(In another terminal).  This will run the application within `mlaas-web`:
 >```
 >$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py"
 >```
@@ -61,6 +50,8 @@ Now that you're environment is set up, you can use `app.py` as a CLI tool. Here'
  - Downloads data from the Qualtrics API. 
     - If it's your first time running this, it'll download all responses to-date. Otherwise it'll check the database for the last response and then only fetch new responses.
  - Feeds concatenated survey comments to a pre-trained `sklearn` classifer to predict spam (1) or ham (0)
+ - User can make changes to what fields to return as part of the outputting spreadsheet in utils/config.py
+   - Keep in mind that you should make sure `SPAM` and `Comment Concatentated` fields should be included for training purpose later.
  - Sleeps to give you time to review the predictions in  `HSM/model/results/ClassificationResults.xlsx`
     - When reviewing the results, the prediction is in the `SPAM` column (0 = ham and 1 = spam). 
     - Make your changes inplace, overwriting the prediction if you disagree.
