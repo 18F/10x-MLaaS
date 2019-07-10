@@ -37,13 +37,13 @@ def make_predictions(df):
     '''
 
     mp = predict.MakePredictions(df, survey_type='sw')
-    results_path, df, id_pred_map = mp.predict()
+    results_path, df, id_pred_map, outfile = mp.predict()
 
-    return results_path, df, id_pred_map
+    return results_path, df, id_pred_map, outfile
 
 
-def user_prompt():
-    print("Done making predictions. You can find the results in ClassificationResults.xlsx")
+def user_prompt(outfile):
+    print("Done making predictions. You can find the results in {}".format(outfile))
     print('-'*80)
     print("Take a moment to review the predictions.")
     print("Change those that you disagree with.")
@@ -110,8 +110,8 @@ def main(survey_name="Site-Wide Survey English", model_description="model_sw.pkl
     db.dal.connect()
     session = db.dal.Session()
     df = get_survey_data(session)
-    results_path, df, id_pred_map = make_predictions(df)
-    user_prompt()
+    results_path, df, id_pred_map, outfile = make_predictions(df)
+    user_prompt(outfile)
     validated_id_pred_map = get_validations(results_path)
 
     insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_description, session)

@@ -1,8 +1,9 @@
 import os
 import pandas as pd
 import dill as pickle
+from datetime import datetime
 from model.train import TrainClassifier
-from utils.config import FIELDS
+from utils.config import FIELDS, survey_id
 
 
 class MakePredictions():
@@ -79,7 +80,8 @@ class MakePredictions():
         results_dir = os.path.join(os.getcwd(), 'model', 'results')
         if not os.path.exists(results_dir):
             os.makedirs(os.path.join(results_dir))
-        results_path = os.path.join(results_dir, 'ClassificationResults.xlsx')
+        outfile = 'ClassificationResults_{}_{}.xlsx'.format(survey_id, datetime.now().strftime('%Y%m%d-%H%M%S'))
+        results_path = os.path.join(results_dir, outfile)
         writer = pd.ExcelWriter(results_path)
         # labeled_data_df.to_excel(writer, 'Classification Results', index=False)
         joined_df.to_excel(writer, 'Classification Results', index=False)
@@ -88,4 +90,4 @@ class MakePredictions():
                                labeled_data_df['SPAM']))
         df = self.df.drop(labels=['Normalized Comments'], axis=1)
 
-        return results_path, df, id_pred_map
+        return results_path, df, id_pred_map, outfile
