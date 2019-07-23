@@ -1,5 +1,6 @@
+import pandas as pd
 from utils import qualtrics, validate, db, db_utils
-from model import predict
+from model import predict, train
 import time
 
 
@@ -89,15 +90,46 @@ def insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_descr
     respondent_attributes = [x.replace(" ", "_") for x in df.columns
                              if x not in survey_questions]
     df['prediction'] = df['ResponseID'].map(id_pred_map)
+    print('*'*80)
+    print('id_pred_map')
+    print(id_pred_map)
     df['validated prediction'] = df['ResponseID'].map(validated_id_pred_map)
+    print('*'*80)
+    print('validated_id_pred_map')
+    print(validated_id_pred_map)
     prediction_set = set(df['prediction'])
+    print('*'*80)
+    print('prediction_set')
+    print(prediction_set)
     validation_set = set(df['validated prediction'])
+    print('*'*80)
+    print('validation_set')
+    print(validation_set)
     db_utils.survey_exists(survey_name, survey_questions, session)
     db_utils.model_exists(model_description, session)
     db_utils.validation_exists(validation_set, session)
     db_utils.prediction_exists(prediction_set, session)
     db_utils.insert_respondents(df, respondent_attributes, session)
     db_utils.insert_responses(df, survey_questions, survey_name, model_description, session)
+
+
+def retrain_model(session):
+    # Find the id of the comments_concatentated row
+    question_id = session.query(db.Question).filter(db.Question.text=="Comments_Concatenated").one().id
+    # comment_spam = session.query(db.Response, db.Validation, db.Respondent) \
+    #                         .filter(db.Response.question_id==question_id) \
+    #                         .filter(db.Response.respondent_id==db.Respondent.id) \
+    #                         .filter(db.Validation.id==db.Response.validation_id).count()
+    comment_spam = session.query(db.Response.text, db.Validation.validation) \
+                            .filter(db.Response.question_id==question_id) \
+                            .filter(db.Response.respondent_id==db.Respondent.id) \
+                            .filter(db.Validation.id==db.Response.validation_id).all()
+    # comment_spam = session.query(db.Response.text, db.Respondent.SPAM) \
+    #                     .filter(db.Response.respondent_id==db.Respondent.id) \
+    #                     .filter(db.Response.question_id==question_id) \
+    #                     .all()
+    df_comment_spam = pd.DataFrame(comment_spam, columns =['Comments Concatenated', 'SPAM'])
+    train.main(df_comment_spam)
 
 
 def main(survey_name="Site-Wide Survey English", model_description="model_sw.pkl"):
@@ -116,6 +148,9 @@ def main(survey_name="Site-Wide Survey English", model_description="model_sw.pkl
 
     insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_description, session)
     session.commit()
+
+    retrain_model(session)
+
     print("DONE!")
 
 
