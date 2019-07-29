@@ -211,7 +211,6 @@ class TrainClassifier():
         lemmas_str = " ".join(lemma for lemma in lemmas)
         return lemmas_str
 
-
     def prepare_train(self):
         if self.train_df is None:
             labeled_data_path = os.path.join('model',
@@ -339,7 +338,8 @@ class TrainClassifier():
 def main(train_df=None):
     tc = TrainClassifier(train_df=train_df)
     train_df = tc.prepare_train()
-    results = tc.randomized_grid_search(train_df)
+    # Right now randomized_grid_search returns results, but not being used here
+    tc.randomized_grid_search(train_df)
 
 
 if __name__ == '__main__':
