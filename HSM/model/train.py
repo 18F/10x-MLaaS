@@ -327,7 +327,7 @@ class TrainClassifier():
                        'roc_auc', 'auc', 'fbeta', 'recalls', 'best_score', 'best_estimator', 'y_test']
         results = {k: v for k, v in zip(result_keys, result_values)}
         if pickle_best:
-            pickle_dir = os.path.join(os.getcwd(), 'model', 'best_estimators')
+            pickle_dir = os.path.join(os.getcwd(), 'HSM', 'model', 'best_estimators')
             if not os.path.exists(pickle_dir):
                 os.makedirs(pickle_dir)
             pickle_path = os.path.join(pickle_dir, 'model_sw.pkl')

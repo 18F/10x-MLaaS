@@ -72,8 +72,8 @@ class MakePredictions():
             print(invalid_fields)
             print("Skipping them in the output...")
 
-        # Only pick out what the user wants to output
-        joined_df = joined_df[valid_fields]
+        # Only pick out what the user wants to output + the Decision Boundary Distance
+        joined_df = joined_df[valid_fields + ["Decision Boundary Distance"]]
         print("Here is the final list of the valid user-choosen fields in the config.py file we are using.")
         print(list(valid_fields))
 
