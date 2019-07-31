@@ -58,10 +58,13 @@ class TrainClassifier():
         metric (str): the classifier scoring metric to use. Choose from:
         accuracy, roc_auc, avg_precision, fbeta, or recall. Note that for fbeta,
         beta = 2.
+        train_df (DataFrame): Training dataframe with 2 columns (Comments Concatenated, SPAM)
+        Default is None
     """
 
-    def __init__(self, metric='avg_precision'):
+    def __init__(self, metric='avg_precision', train_df=None):
         self.metric = metric
+        self.train_df = train_df
 
     @staticmethod
     def clean(doc):
@@ -209,11 +212,14 @@ class TrainClassifier():
         return lemmas_str
 
     def prepare_train(self):
-        labeled_data_path = os.path.join('model',
-                                         'training_data',
-                                         'training-sw.xlsx')
+        if self.train_df is None:
+            labeled_data_path = os.path.join('model',
+                                             'training_data',
+                                             'training-sw.xlsx')
 
-        train_df = pd.read_excel(labeled_data_path)
+            train_df = pd.read_excel(labeled_data_path)
+        else:
+            train_df = self.train_df
         print("\tNormalizing the text...")
         # normalize the comments, preparing for tf-idf
         train_df['Normalized Comments'] = train_df['Comments Concatenated'].astype(str).apply(
@@ -320,7 +326,7 @@ class TrainClassifier():
                        'roc_auc', 'auc', 'fbeta', 'recalls', 'best_score', 'best_estimator', 'y_test']
         results = {k: v for k, v in zip(result_keys, result_values)}
         if pickle_best:
-            pickle_dir = os.path.join(os.getcwd(), 'model', 'best_estimators')
+            pickle_dir = os.path.join(os.getcwd(), 'HSM', 'model', 'best_estimators')
             if not os.path.exists(pickle_dir):
                 os.makedirs(pickle_dir)
             pickle_path = os.path.join(pickle_dir, 'model_sw.pkl')
@@ -329,7 +335,12 @@ class TrainClassifier():
         return results
 
 
-if __name__ == '__main__':
-    tc = TrainClassifier()
+def main(train_df=None):
+    tc = TrainClassifier(train_df=train_df)
     train_df = tc.prepare_train()
-    results = tc.randomized_grid_search(train_df)
+    # Right now randomized_grid_search returns results, but not being used here
+    tc.randomized_grid_search(train_df)
+
+
+if __name__ == '__main__':
+    main()

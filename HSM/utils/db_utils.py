@@ -1,7 +1,18 @@
 import pandas as pd
 from utils.config import SQLALCHEMY_URI
 from sqlalchemy_utils import database_exists, create_database
-from utils.db import Survey, Question, SurveyQuestion, Respondent, Response, Model, Version, Prediction, Validation
+from utils.db import (
+    Survey,
+    Question,
+    SurveyQuestion,
+    Respondent,
+    Response,
+    Model,
+    Version,
+    Prediction,
+    Validation,
+    VersionPrediction
+)
 from sqlalchemy import desc, func,  create_engine
 
 
@@ -34,6 +45,7 @@ def model_exists(model_description, session):
     model_description = model_description.replace("_" + version_description, "")
     version = Version(description=version_description)
     model_descriptions = []
+    # TODO: Why are we doing this instead of querying the database directly for the row.description match?)
     for row in session.query(Model.description).all():
         model_descriptions.append(row.description)
     if model_description in model_descriptions:
@@ -71,6 +83,7 @@ def prediction_exists(prediction_set, session):
 
 
 def insert_respondents(df, respondent_attributes, session):
+    # Get the number of rows here
     for i in range(df.shape[0]):
         if (i % 1000) == 0:
             session.commit()
@@ -122,28 +135,31 @@ def insert_responses(df, survey_questions, survey_name, model_description, sessi
             session.flush()
         data = df.iloc[i][survey_questions+['ResponseID', 'prediction', 'validated prediction']]
         respondent_id = fetch_respondent_id(data['ResponseID'], session)
-        # validation = int(data['validated prediction'])
-        # validation_id = fetch_validation_id(validation, session)
-        # pred = int(data['prediction'])
-        # prediction_id = fetch_prediction_id(pred, session)
+        validation = int(data['validated prediction'])
+        validation_id = fetch_validation_id(validation, session)
+        pred = int(data['prediction'])
+        prediction_id = fetch_prediction_id(pred, session)
         # prediction = session.query(Prediction).get(prediction_id)
-        # val = session.query(Validation).get(validation_id)
+        val = session.query(Validation).get(validation_id)
         for q in survey_questions:
             question_id = fetch_question_id(q, session)
             response = Response(survey_id=survey_id,
                                 question_id=question_id,
                                 respondent_id=respondent_id,
                                 text=data[q])
-            # val.responses.append(response)
+
+            val.responses.append(response)
             session.add(response)
-            # response_id = response.id
-            # version_prediction = VersionPrediction()
-            # version_prediction.model_id = model_id
-            # version_prediction.version_id = version_id
-            # version_prediction.prediction_id = prediction_id
-            # version_prediction.response_id = response_id
+            # By flushing we can get the response ID
+            session.flush()
+            response_id = response.id
+            version_prediction = VersionPrediction()
+            version_prediction.model_id = model_id
+            version_prediction.version_id = version_id
+            version_prediction.prediction_id = prediction_id
+            version_prediction.response_id = response_id
             # version_prediction.prediction = prediction
-            # session.add(version_prediction)
+            session.add(version_prediction)
         session.commit()
 
 

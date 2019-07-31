@@ -1,6 +1,8 @@
-from utils import qualtrics, validate, db, db_utils
-from model import predict
 import time
+from argparse import ArgumentParser
+import pandas as pd
+from utils import qualtrics, validate, db, db_utils
+from model import predict, train
 
 
 def get_survey_data(session):
@@ -52,7 +54,7 @@ def user_prompt(outfile):
     user_input = ''
     while user_input != 'y':
         user_input = str(input("If you've finished reviewing the predictions, enter 'y': "))
-    print("Inserting data into database. Hold on...")
+    print("Inserting data into database. It may take a while.  Hold on...")
 
 
 def get_validations(results_path):
@@ -64,7 +66,7 @@ def get_validations(results_path):
         results_path (str): abs path to the results, ClassificationResults.xlsx
 
     Returns:
-        validated_id_pred_map (dict): a dict mapping Qualtrics ResponseIDs to the user-validated SPAM preditions
+        validated_id_pred_map (dict): a dict mapping Qualtrics ResponseIDs to the user-validated SPAM predictions
     '''
     v = validate.Validate(results_path)
     validated_id_pred_map = v.get_validations()
@@ -100,6 +102,17 @@ def insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_descr
     db_utils.insert_responses(df, survey_questions, survey_name, model_description, session)
 
 
+def retrain_model(session):
+    # Find the id of the comments_concatentated row
+    question_id = session.query(db.Question).filter(db.Question.text == "Comments_Concatenated").one().id
+    comment_spam = session.query(db.Response.text, db.Validation.validation) \
+                          .filter(db.Response.question_id == question_id) \
+                          .filter(db.Response.respondent_id == db.Respondent.id) \
+                          .filter(db.Validation.id == db.Response.validation_id).all()
+    df_comment_spam = pd.DataFrame(comment_spam, columns=['Comments Concatenated', 'SPAM'])
+    train.main(df_comment_spam)
+
+
 def main(survey_name="Site-Wide Survey English", model_description="model_sw.pkl"):
     '''
     Create db if it doesn't exist; fetch survey data from Qualtrics; make predictions; provide the user
@@ -116,8 +129,24 @@ def main(survey_name="Site-Wide Survey English", model_description="model_sw.pkl
 
     insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_description, session)
     session.commit()
+
+    retrain_model(session)
+
     print("DONE!")
 
 
 if __name__ == '__main__':
-    main()
+
+    program_desc = '''This application will get survey data from Qualtrics and make prediction on the data.
+                      It will then retrain the model based on the validated data.'''
+
+    parser = ArgumentParser(description=program_desc)
+    parser.add_argument("-s", "--survey_name", dest="survey_name",
+                        help="specify survey name to use", default="Site-Wide Survey English")
+    parser.add_argument("-m", "--model",
+                        default="model_sw.pkl",
+                        help="specify model file name")
+
+    args = parser.parse_args()
+
+    main(survey_name=args.survey_name, model_description=args.model)
