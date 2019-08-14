@@ -1,4 +1,18 @@
 import os
+from werkzeug.security import generate_password_hash
+
+# FLASK SETTINGS
+APP_SECRET_KEY = os.environ['APP_SECRET_KEY']
+APP_PORT = os.getenv("PORT", 8080)
+
+# USER SETTINGS
+amy = os.getenv("AMY")
+david = os.getenv("DAVID")
+
+users = {
+    "amy": generate_password_hash(amy),
+    "david": generate_password_hash(david)
+}
 
 # DATABASE SETTINGS
 DIALECT = "postgresql+psycopg2"

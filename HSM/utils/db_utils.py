@@ -1,7 +1,7 @@
 import pandas as pd
-from utils.config import SQLALCHEMY_URI
+from HSM.utils.config import SQLALCHEMY_URI
 from sqlalchemy_utils import database_exists, create_database
-from utils.db import (
+from HSM.utils.db import (
     Survey,
     Question,
     SurveyQuestion,

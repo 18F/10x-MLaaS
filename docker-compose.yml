@@ -4,8 +4,9 @@ services:
         build: .
         tty: true
         container_name: mlaas-web
+        restart: always
         ports:
-            - "5000:5000"
+            - "8080:8080"
         environment:
             - DB_NAME=hsm-db
             - DB_ADDR=mlaas-db
@@ -18,6 +19,8 @@ services:
         networks:
             - db_nw
             - web_nw
+        entrypoint:
+            - ./docker-entrypoint.sh
     db:
         image: "postgres:9.6.5"
         container_name: mlaas-db

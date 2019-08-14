@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker
-from utils.config import SQLALCHEMY_URI
+from HSM.utils.config import SQLALCHEMY_URI
 
 Base = declarative_base()
 
