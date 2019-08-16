@@ -19,6 +19,7 @@ class BasicTestCase(unittest.TestCase):
         tester = app.test_client(self)
         response = tester.get(input)
         self.assertEqual(response.status_code, 401)
+        self.assertDictEqual(json.loads(response.data), {'error': 'Unauthorized access'})
 
     @parameterized.expand([
         ("index", "/", {'title': 'Predict->Validate->Train', 'username': 'amy'}),
@@ -34,6 +35,12 @@ class BasicTestCase(unittest.TestCase):
         response = tester.get(input, headers={'Authorization': 'Basic ' + creds})
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(json.loads(response.data), expected)
+
+    def test_invalid_path(self):
+        tester = app.test_client(self)
+        response = tester.get('/not_valid')
+        self.assertEqual(response.status_code, 404)
+        self.assertDictEqual(json.loads(response.data), {'error': 'Not found'})
 
 
 if __name__ == '__main__':
