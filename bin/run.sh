@@ -1,5 +1,5 @@
 #!/bin/bash
-ROOT=HSM
+ROOT=$HOME/HSM
 
 cd $ROOT
 gunicorn api:app
