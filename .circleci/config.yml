@@ -19,55 +19,30 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          # - v1-dependencies-{{ checksum "HSM/requirements-dev.txt" }}-{{ checksum "HSM/requirements.txt"}}
           - v1-dependencies-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          # - v1-dependencies-
-
-      # - run:
-      #     name: Setup environment
-      #     command: |
-      #       python -m venv venv
-      #       . venv/bin/activate
-
-      #       pip install -r HSM/requirements-dev.txt
 
       - run:
           name: install dependencies
           command: |
             pip install pipenv
             pipenv install --dev
+
       - save_cache:
           paths:
             - ./.venv
           key: v1-dependencies-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
 
       - run:
-          name: copy environment variables using sample .env
+          name: Put sample environment variables in place
           command: |
             cp sample.env .env
 
-      # - save_cache:
-      #     paths:
-      #       - ./venv
-      #     key: v1-dependencies-{{ checksum "HSM/requirements-dev.txt" }}-{{ checksum "HSM/requirements.txt"}}
-
-      # - run:
-      #     name: HSM test suite
-      #     command: |
-      #       . .venv/bin/activate
-      #       cd HSM
-      #       python -m unittest
       - run:
           name: HSM test suite
           command: |
             cd HSM
             pipenv run python -m unittest
-      # - run:
-      #     name: Flake8
-      #     command: |
-      #       . .venv/bin/activate
-      #       flake8
+
       - run:
           name: Flake8
           command: |
