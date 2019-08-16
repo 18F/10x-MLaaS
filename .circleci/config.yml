@@ -35,8 +35,6 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            pwd
-            ls -l
             pip install pipenv
             pipenv install --dev
       - save_cache:
@@ -44,6 +42,10 @@ jobs:
             - ./.venv
           key: v1-dependencies-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
 
+      - run:
+          name: copy environment variables using sample .env
+          command: |
+            cp sample.env .env
 
       # - save_cache:
       #     paths:
