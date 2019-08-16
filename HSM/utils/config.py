@@ -1,13 +1,29 @@
 import os
+from werkzeug.security import generate_password_hash
+
+# FLASK SETTINGS
+APP_SECRET_KEY = os.environ['APP_SECRET_KEY']
+APP_PORT = os.getenv("PORT", 8080)
+
+# USER SETTINGS
+users = {
+    "admin": generate_password_hash(os.getenv("ADMIN")),
+    "user": generate_password_hash(os.getenv("USER"))
+}
 
 # DATABASE SETTINGS
-DIALECT = "postgresql+psycopg2"
-DB_USER = os.environ['DB_USER']
-DB_PASS = os.environ['DB_PASS']
-DB_ADDR = os.environ['DB_ADDR']
-DB_NAME = os.environ['DB_NAME']
+if not os.getenv('CLOUD_GOV'):
+    DIALECT = "postgresql+psycopg2"
+    DB_USER = os.getenv('DB_USER')
+    DB_PASS = os.getenv('DB_PASS')
+    DB_ADDR = os.getenv('DB_ADDR')
+    DB_NAME = os.getenv('DB_NAME')
 
-SQLALCHEMY_URI = f"{DIALECT}://{DB_USER}:{DB_PASS}@{DB_ADDR}/{DB_NAME}"
+    SQLALCHEMY_URI = f"{DIALECT}://{DB_USER}:{DB_PASS}@{DB_ADDR}/{DB_NAME}"
+else:  # CLOUD_GOV
+    SQLALCHEMY_URI = os.getenv('DATABASE_URL')
+    if "postgresql:" in SQLALCHEMY_URI:  # This means the dialect is not included
+        SQLALCHEMY_URI = SQLALCHEMY_URI.replace("postgresql:" "postgresql+psycopg2:", 1)
 
 
 # QUALTRICS API SETTINGS
