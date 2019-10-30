@@ -42,8 +42,8 @@ def main(file):
 
 if __name__ == '__main__':
 
-    program_desc = '''This application will get the spreadsheet and pull out essential data to fill out 
-                      the database. It will populate the database in the `data` table.  It also put all 
+    program_desc = '''This application will get the spreadsheet and pull out essential data to fill out
+                      the database. It will populate the database in the `data` table.  It also put all
                       other data in the database as well in support_data table.'''
 
     parser = ArgumentParser(description=program_desc)

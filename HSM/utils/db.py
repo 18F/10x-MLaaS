@@ -30,6 +30,7 @@ class Data(Base):
 
     support_data = relationship("SupportData", uselist=False, back_populates="data")
 
+
 class SupportData(Base):
     __tablename__ = 'support_data'
     id = Column(Integer, primary_key=True, index=True)
@@ -37,6 +38,7 @@ class SupportData(Base):
 
     data_id = Column(Integer, ForeignKey('data.id'), nullable=False)
     data = relationship("Data", back_populates="support_data")
+
 
 class Survey(Base):
     __tablename__ = 'survey'
