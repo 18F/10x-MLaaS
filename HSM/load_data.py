@@ -33,11 +33,9 @@ def main(file):
         support_data_obj.data = data_obj
         support_data_obj.data_id = support_data_obj.data.id
         session.add(support_data_obj)
-        print(f'data: {data_obj.id}')
-        print(f'support_data: {support_data_obj.id}')
-        print(f'support_data.data: {support_data_obj.data.id}')
 
     session.commit()
+    print(f'Loaded {len(data)} records of data and support_data.')
 
 
 if __name__ == '__main__':
