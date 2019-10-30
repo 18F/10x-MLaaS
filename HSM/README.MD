@@ -66,7 +66,7 @@ There are times we need to load data in the database.  `load_data.py` will help 
 
 To use `load_data.py`, you can specify the path to the spreadsheet file that contains all the data.  The data will include two fields that represent the `filter_feature` and `validation`.
 - `filter_feature` - This value is the filter feature that is used to run prediction on.  In this specific case, it is the `'Comments Concatenated'` field.
-- `validation` - This value is the validation that started as a prediction and subject matter expert verified and correct any mistake.  In this specific case, it is the `'Validation'`.
+- `validation` - This value is the validation that started as a prediction and subject matter expert verified and corrected any mistake.  In this specific case, it is the `'Validation'`.
 
 To run `load_data.py`, type in the following commands in the terminal (this assumes you have `docker_compose up` running):
 ```bash
