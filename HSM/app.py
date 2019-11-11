@@ -100,7 +100,7 @@ def insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_descr
     # db_utils.prediction_exists(prediction_set, session)
     # db_utils.insert_respondents(df, respondent_attributes, session)
     # db_utils.insert_responses(df, survey_questions, survey_name, model_description, session)
-    db_utils.insert_data(df)
+    db_utils.insert_data(df, session)
 
 
 def retrain_model(session):

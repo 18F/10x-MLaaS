@@ -16,7 +16,7 @@ from utils.db import (
     Validation,
     # VersionPrediction
 )
-from utils.config import ENTRY_ID, FILTER_FEATURE, VALIDATION
+from utils.config import ENTRY_ID
 from sqlalchemy import create_engine  # , desc, event, func
 from sqlalchemy import func
 # from sqlalchemy.engine import Engine
@@ -194,7 +194,9 @@ def insert_data(df, session):
     Insert data and supporting data into database
     '''
 
-    data_columns = [FILTER_FEATURE, VALIDATION]
+    filter_feature = 'Comments_Concatenated'
+    validation = 'validated prediction'
+    data_columns = [filter_feature, validation]
 
     data = df[data_columns]
     support_data = json.loads(df[df.columns.difference(data_columns)].to_json(orient='records'))
@@ -204,7 +206,7 @@ def insert_data(df, session):
         data_row = data.iloc[i]
         support_data_row = support_data[i]
 
-        data_obj = Data(filter_feature=str(data_row[FILTER_FEATURE]), validation=int(data_row[VALIDATION]))
+        data_obj = Data(filter_feature=str(data_row[filter_feature]), validation=int(data_row[validation]))
         session.add(data_obj)
         session.flush()
         support_data_obj = SupportData(support_data=support_data_row)
