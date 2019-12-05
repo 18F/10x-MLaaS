@@ -1,6 +1,5 @@
 import time
 from argparse import ArgumentParser
-# import pandas as pd
 from utils import qualtrics, validate, db, db_utils
 from model import predict, train
 
@@ -68,6 +67,7 @@ def get_validations(results_path):
     Returns:
         validated_id_pred_map (dict): a dict mapping Qualtrics ResponseIDs to the user-validated SPAM predictions
     '''
+
     v = validate.Validate(results_path)
     validated_id_pred_map = v.get_validations()
 
@@ -87,30 +87,19 @@ def insert_data(df, validated_id_pred_map, id_pred_map, survey_name, model_descr
         session: a sqlalchemy session object
     '''
 
-    # survey_questions = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Comments_Concatenated']
-    # respondent_attributes = [x.replace(" ", "_") for x in df.columns
-    #                          if x not in survey_questions]
     df['prediction'] = df['ResponseID'].map(id_pred_map)
     df['validated prediction'] = df['ResponseID'].map(validated_id_pred_map)
-    # prediction_set = set(df['prediction'])
-    # validation_set = set(df['validated prediction'])
-    # db_utils.survey_exists(survey_name, survey_questions, session)
-    # db_utils.model_exists(model_description, session)
-    # db_utils.validation_exists(validation_set, session)
-    # db_utils.prediction_exists(prediction_set, session)
-    # db_utils.insert_respondents(df, respondent_attributes, session)
-    # db_utils.insert_responses(df, survey_questions, survey_name, model_description, session)
     db_utils.insert_data(df, session)
 
 
 def retrain_model(session):
-    # Find the id of the comments_concatentated row
-    # question_id = session.query(db.Question).filter(db.Question.text == "Comments_Concatenated").one().id
-    # comment_spam = session.query(db.Response.text, db.Validation.validation) \
-    #                       .filter(db.Response.question_id == question_id) \
-    #                       .filter(db.Response.respondent_id == db.Respondent.id) \
-    #                       .filter(db.Validation.id == db.Response.validation_id).all()
-    # df_comment_spam = pd.DataFrame(comment_spam, columns=['Comments Concatenated', 'SPAM'])
+    '''
+    Retrain the model by getting all data from database to do so.  Called train to train the model and save
+    it to the designated place.
+
+    Parameters:
+        session: a database session that will be passed in to access the database data
+    '''
 
     df_comment_spam = db_utils.get_data(session, filter_feature='Comments Concatenated', validation='SPAM')
 
