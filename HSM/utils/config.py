@@ -12,6 +12,7 @@ users = {
 }
 
 # DATABASE SETTINGS
+print(f'CLOUD_GOV:{os.getenv("CLOUD_GOV")}')
 if not os.getenv('CLOUD_GOV'):
     DIALECT = "postgresql+psycopg2"
     DB_USER = os.getenv('DB_USER')
@@ -31,6 +32,8 @@ apiToken = os.environ['QUALTRICS_API_TOKEN']
 survey_id = os.environ['QUALTRICS_SW_SURVEY_ID']
 qualtrics_sitewide_creds = {"apiToken": apiToken,
                             "surveyId": survey_id}
+
+# CELERY SETTINGS
 
 # SPREADSHEET SETTINGS
 FIELDS = [
@@ -66,3 +69,8 @@ FIELDS = [
     "Browser Metadata Q_4_TEXT",
     # "Duration (in seconds)",
 ]
+
+# DATA COLUMNS SETTINGS
+FILTER_FEATURE = 'Comments Concatenated'
+VALIDATION = 'Validation'
+ENTRY_ID = 'ResponseID'
