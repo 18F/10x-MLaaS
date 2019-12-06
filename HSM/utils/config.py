@@ -33,6 +33,11 @@ survey_id = os.environ['QUALTRICS_SW_SURVEY_ID']
 qualtrics_sitewide_creds = {"apiToken": apiToken,
                             "surveyId": survey_id}
 
+# INPUT FILE SETTINGS
+INPUT_DIR = os.path.join(os.getcwd(), 'HSM', 'model', 'inputs')
+if not os.path.exists(INPUT_DIR):
+    os.makedirs(os.path.join(INPUT_DIR))
+
 # CELERY SETTINGS
 
 # SPREADSHEET SETTINGS
