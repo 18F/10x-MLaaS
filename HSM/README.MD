@@ -38,15 +38,32 @@ This will bring up the containers:
 >```
 >$ docker-compose up
 >```
-  
+
+##### Using Qualtrics API
+If the input exists in Qualtrics, you can run the command without any parameters.
+
 (In another terminal).  This will run the application within `mlaas-web`:
 >```
 >$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py"
 >```
 
+##### Using Excel Spreadsheet
+If the input is an Excel file (.xlsx), the Excel input file requires to be saved in `10x-MLaaS/HSM/model/inputs`.
+You will need to only supply the filename in the command below. Replace <filename> with the actual filename.
+
+(In another terminal).  This will run the application within `mlaas-web`:
+>```
+>$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py -i <filename>"
+>```
+
+i.e. The file path is `~/workspace/10x-MLaaS/HSM/model/inputs/survey.xlsx`, so the filename would be `survey.xlsx`.
+The command would be as follows:
+>```
+>$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py -i survey.xlsx"
+>```
 
 ## Using the CLI
-Now that you're environment is set up, you can use `app.py` as a CLI tool. Here's what that script does:
+Now that your environment is set up, you can use `app.py` as a CLI tool. Here's what that script does:
  - Downloads data from the Qualtrics API. 
     - If it's your first time running this, it'll download all responses to-date. Otherwise it'll check the database for the last response and then only fetch new responses.
  - Feeds concatenated survey comments to a pre-trained `sklearn` classifer to predict spam (1) or ham (0)

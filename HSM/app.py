@@ -1,24 +1,33 @@
+import os
 import time
+import pandas as pd
 from argparse import ArgumentParser
-from utils import qualtrics, validate, db, db_utils
+from utils import config, qualtrics, validate, db, db_utils
 from model import predict, train
 
 
-def get_survey_data(session):
+def get_survey_data(session, excel_filename=None):
     '''
     Implements the Qualtrics class to get most recent qualtrics survey data from their API.
 
     Parameters:
         session: a sqlalchemy session object
+        excel_filename: The filename of the Excel file that has the input
 
     Returns:
         df (pandas DataFrame): a dataframe of the survey data
     '''
+    if excel_filename:
+        print(f'******** Getting data from Excel Spreadsheet at location {excel_filename} ********')
+        input_path = os.path.join(config.INPUT_DIR, excel_filename)
+        df = pd.read_excel(input_path)
 
-    last_response_id = db_utils.fetch_last_RespondentID(session)
-    qa = qualtrics.QualtricsApi(last_response_id)
-    qa.download_responses()
-    df = qa.get_data()
+    else:  # QUALTRICS
+        print(f'******** Reading data from Qualtrics ********')
+        last_response_id = db_utils.fetch_last_RespondentID(session)
+        qa = qualtrics.QualtricsApi(last_response_id)
+        qa.download_responses()
+        df = qa.get_data()
 
     return df
 
@@ -106,7 +115,7 @@ def retrain_model(session):
     train.main(df_comment_spam)
 
 
-def main(survey_name="Site-Wide Survey English", model_description="model_sw.pkl"):
+def main(survey_name="Site-Wide Survey English", model_description="model_sw.pkl", excel_filename=None):
     '''
     Create db if it doesn't exist; fetch survey data from Qualtrics; make predictions; provide the user
     with a chance to validate the predictions in a spreadsheet; and insert data into db.
@@ -115,7 +124,7 @@ def main(survey_name="Site-Wide Survey English", model_description="model_sw.pkl
     db_utils.create_postgres_db()
     db.dal.connect()
     session = db.dal.Session()
-    df = get_survey_data(session)
+    df = get_survey_data(session, excel_filename)
     results_path, df, id_pred_map, outfile = make_predictions(df)
     user_prompt(outfile)
     validated_id_pred_map = get_validations(results_path)
@@ -139,7 +148,10 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--model",
                         default="model_sw.pkl",
                         help="specify model file name")
+    parser.add_argument("-i", "--input", default=None,
+                        help="specify input excel file name else Qualtrics API is being used to get data, file is "
+                             "expected to be saved at 10x-MLaaS/HSM/model/inputs folder")
 
     args = parser.parse_args()
 
-    main(survey_name=args.survey_name, model_description=args.model)
+    main(survey_name=args.survey_name, model_description=args.model, excel_filename=args.input)
