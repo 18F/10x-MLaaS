@@ -56,10 +56,7 @@ class MakePredictions():
         labeled_data_df = pd.DataFrame(X)
         labeled_data_df.columns = [FILTER_FEATURE]
         labeled_data_df[PREDICTION_FIELD_NAME] = preds
-        print("#### This is dec_func")
-        print(dec_func)
         labeled_data_df['Decision Boundary Distance'] = abs(dec_func)
-        print(labeled_data_df['Decision Boundary Distance'])
         for col in data_columns:
             labeled_data_df[col] = data_columns[col]
 
