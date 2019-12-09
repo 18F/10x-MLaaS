@@ -76,9 +76,18 @@ FIELDS = [
 ]
 
 # DATA COLUMNS SETTINGS
+
+## Fields are needed to do filter, they will be combined to be used for prediction and training
 FILTER_FEATURE_FIELDS = ['Q5', 'Q7', 'Q6', 'Q3']
+
+## Fielded from the raw spreadsheet to be included when processing data
 FIELDS_TO_INCLUDED_FOR_PROCESSED_DATA_MAPPING = {'ResponseID': 'ResponseID', 'Date': 'EndDate'}
+
+## Field name that represents the filter feature
 FILTER_FEATURE = 'Comments Concatenated'
+
+## Field name to place the prediction/validation
 PREDICTION_FIELD_NAME = 'SPAM'
-VALIDATION = 'Validation'
+
+## Field name that identify each row in the raw spreadsheet
 ENTRY_ID = 'ResponseID'
