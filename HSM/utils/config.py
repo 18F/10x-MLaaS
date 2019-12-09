@@ -76,6 +76,9 @@ FIELDS = [
 ]
 
 # DATA COLUMNS SETTINGS
+FILTER_FEATURE_FIELDS = ['Q5', 'Q7', 'Q6', 'Q3']
+FIELDS_TO_INCLUDED_FOR_PROCESSED_DATA_MAPPING = {'ResponseID': 'ResponseID', 'Date': 'EndDate'}
 FILTER_FEATURE = 'Comments Concatenated'
+PREDICTION_FIELD_NAME = 'SPAM'
 VALIDATION = 'Validation'
 ENTRY_ID = 'ResponseID'
