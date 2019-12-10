@@ -112,7 +112,7 @@ class QualtricsApi:
         """
         Convert the json into a pandas dataframe
         """
-        file_name = os.path.join(os.getcwd(), 'temp', 'USAgov Official Sitewide Survey.json')
+        file_name = os.path.join(os.getcwd(), 'temp', qualtrics_sitewide_creds['filename'])
         with open(file_name, encoding='utf8') as f:
             data = json.load(f)
         df = pd.DataFrame(data['responses'])

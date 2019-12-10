@@ -31,6 +31,23 @@ Modify Qualtrics Env variables in `.env`:
 >QUALTRICS_SW_SURVEY_ID=<site_wide_survey_id>
 >```
 
+Install Pipenv if it is not installed:
+```
+pip install pipenv
+```
+
+Create a virtual environment with Pipenv to load environment variables locally to name the containers:
+```
+pipenv shell
+```
+
+If you ever made a new change to the `.env` file, you will need to restart your virtual environment and rebuild your containers:
+Assuming you already started `pipenv shell` and you just updated your `.env`, then you can use the following commands:
+```
+exit # This will exit out of the virtual environmnet
+pipenv shell
+docker-compose build
+```
 
 #### Step 3 Build & Run!  
 
