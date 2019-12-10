@@ -11,11 +11,14 @@
 
 ### Step 1: Clone the Repository
 Navigate to where you'd like to clone the repo. Then clone it:
->`$ git clone https://github.com/18F/10x-MLaaS.git`
+```bash
+git clone https://github.com/18F/10x-MLaaS.git
+```
 
 Now `cd` into the repository you've just cloned:
->`$ cd 10x-MLaaS`
-
+```bash
+cd 10x-MLaaS`
+```
 
 ### Step 2: Run with Docker & Docker Compose
 
@@ -25,25 +28,25 @@ https://docs.docker.com/compose/install/
 
 #### Step b: Configure Environment Variables
 
->```
->$ cp sample.env .env
->```
+```bash
+cp sample.env .env
+```
 
 Modify environment variables to set up for the specific dataset in `.env`.  See details in `.env`.
 
 Install Pipenv if it is not installed:
-```
+```bash
 pip install pipenv
 ```
 
 Create a virtual environment with Pipenv to load environment variables locally to name the containers:
-```
+```bash
 pipenv shell
 ```
 
 If you ever made a new change to the `.env` file, you will need to restart your virtual environment and rebuild your containers:
 Assuming you already started `pipenv shell` and you just updated your `.env`, then you can use the following commands:
-```
+```bash
 exit # This will exit out of the virtual environmnet
 pipenv shell
 ```
@@ -54,19 +57,19 @@ After that is done you will see a `(10x-MLaaS)` or the name of the base folder i
 #### Step 3 Build & Run!  
 
 This will bring up the containers:
->```
->$ docker-compose up --build
->```
+```bash
+docker-compose up --build
+```
 
 ##### Using Qualtrics API
 If the input exists in Qualtrics, you can run the command without any parameters.
 
 (In another terminal).  This will run the application within `${CONTAINER_NAME_WEB}`.  `${CONTAINER_NAME_WEB}` is an
 environment variable you have specified in your `.env` file.
->```
->$ pipenv shell
->$ docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py"
->```
+```bash
+pipenv shell
+docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py"
+```
 
 ##### Using Excel Spreadsheet
 If the input is an Excel file (.xlsx), the Excel input file requires to be saved in `10x-MLaaS/HSM/model/inputs`.
@@ -74,16 +77,16 @@ You will need to only supply the filename in the command below. Replace <filenam
 
 (In another terminal).  This will run the application within `${CONTAINER_NAME_WEB}`  `${CONTAINER_NAME_WEB}` is an
 environment variable you have specified in your `.env` file.
->```
->$ pipenv shell
->$ docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py -i <filename>"
->```
+```bash
+pipenv shell
+docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py -i <filename>"
+```
 
 i.e. The file path is `~/workspace/10x-MLaaS/HSM/model/inputs/survey.xlsx`, so the filename would be `survey.xlsx`.
 The command would be as follows:
->```
->$ docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py -i survey.xlsx"
->```
+```bash
+docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py -i survey.xlsx"
+```
 
 ## Using the CLI
 Now that your environment is set up, you can use `app.py` as a CLI tool. Here's what that script does:
