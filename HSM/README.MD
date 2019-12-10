@@ -1,6 +1,12 @@
 # HSM
 `app.py` provides a command line interface for the Ham-Spam Machine (HSM). Currently, it only fetches and classifies responses to the **site-wide version** of the survey. It uses a local instance of a postgreSQL database, although it does allow the user to validate comment predictions in excel while the script is sleeping.
 
+## Requirements
+- [Docker](https://www.docker.com/)
+- [Python](https://www.python.org/) (3.6)
+- [pipenv](https://pipenv.kennethreitz.org/en/latest/)
+
+
 ## Getting Started
 
 ### Step 1: Clone the Repository
@@ -23,13 +29,7 @@ https://docs.docker.com/compose/install/
 >$ cp sample.env .env
 >```
 
-Modify Qualtrics Env variables in `.env`:
-
->```
-># In ~/10x-MLaaS/.env
->QUALTRICS_API_TOKEN=<token>
->QUALTRICS_SW_SURVEY_ID=<site_wide_survey_id>
->```
+Modify environment variables to set up for the specific dataset in `.env`.  See details in `.env`.
 
 Install Pipenv if it is not installed:
 ```
@@ -46,37 +46,43 @@ Assuming you already started `pipenv shell` and you just updated your `.env`, th
 ```
 exit # This will exit out of the virtual environmnet
 pipenv shell
-docker-compose build
 ```
+
+After that is done you will see a `(10x-MLaaS)` or the name of the base folder if you have changed it in front of your command line prompt.
+
 
 #### Step 3 Build & Run!  
 
 This will bring up the containers:
 >```
->$ docker-compose up
+>$ docker-compose up --build
 >```
 
 ##### Using Qualtrics API
 If the input exists in Qualtrics, you can run the command without any parameters.
 
-(In another terminal).  This will run the application within `mlaas-web`:
+(In another terminal).  This will run the application within `${CONTAINER_NAME_WEB}`.  `${CONTAINER_NAME_WEB}` is an
+environment variable you have specified in your `.env` file.
 >```
->$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py"
+>$ pipenv shell
+>$ docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py"
 >```
 
 ##### Using Excel Spreadsheet
 If the input is an Excel file (.xlsx), the Excel input file requires to be saved in `10x-MLaaS/HSM/model/inputs`.
 You will need to only supply the filename in the command below. Replace <filename> with the actual filename.
 
-(In another terminal).  This will run the application within `mlaas-web`:
+(In another terminal).  This will run the application within `${CONTAINER_NAME_WEB}`  `${CONTAINER_NAME_WEB}` is an
+environment variable you have specified in your `.env` file.
 >```
->$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py -i <filename>"
+>$ pipenv shell
+>$ docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py -i <filename>"
 >```
 
 i.e. The file path is `~/workspace/10x-MLaaS/HSM/model/inputs/survey.xlsx`, so the filename would be `survey.xlsx`.
 The command would be as follows:
 >```
->$ docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "python ~/HSM/app.py -i survey.xlsx"
+>$ docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py -i survey.xlsx"
 >```
 
 ## Using the CLI
@@ -102,9 +108,10 @@ To use `load_data.py`, you can specify the path to the spreadsheet file that con
 - `filter_feature` - This value is the filter feature that is used to run prediction on.  In this specific case, it is the `'Comments Concatenated'` field.
 - `validation` - This value is the validation that started as a prediction and subject matter expert verified and corrected any mistake.  In this specific case, it is the `'Validation'`.
 
-To run `load_data.py`, type in the following commands in the terminal (this assumes you have `docker_compose up` running):
+To run `load_data.py`, type in the following commands in the terminal (this assumes you have `docker_compose up` running and your command line prompt activated
+the virtual environment with `pipenv shell`):
 ```bash
-docker exec --user hsm --workdir /home/hsm -it mlaas-web /bin/bash -c "cd HSM;python load_data.py <file>"
+docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "cd HSM;python load_data.py <file>"
 ```
 
 
