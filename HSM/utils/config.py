@@ -34,7 +34,6 @@ filename = os.environ['QUALTRICS_FILENAME']
 if filename:
     filename = filename.replace('"', '').replace("'", "")
 
-print(f'This is QUALTRICS_FILENAME: {filename}')
 qualtrics_sitewide_creds = {
                             "apiToken": apiToken,
                             "surveyId": survey_id,
