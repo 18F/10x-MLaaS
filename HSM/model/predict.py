@@ -69,8 +69,14 @@ class MakePredictions():
         joined_df = pd.merge(self.df, labeled_data_df, on=ENTRY_ID, how='outer')
 
         if PREDICTION_FIELD_NAME + '_x' in joined_df.columns:  # This means there are two SPAM columns
-            # There are two SPAM columns, SPAM_x and SPAM_y, SPAM_x should be removed because it is an empty column
-            # Need to rename SPAM_y to SPAM
+            # There can be two columns for the prediction fields, one in df (which will have a suffix of _x),
+            # one in labeled_data_df (which will have a suffix of _y),
+            # and we will keep the one from labeled_data_df because it holds the actual prediction
+            # but this field needs to rename to with _y.
+            # i.e. SPAM is the field name and it appears in df and labeled_data_df, then we will have SPAM_x
+            # and SPAM_y column when joined in joined_df, right now assuming we are using SPAM_y because it
+            # holds the actual prediction, and SPAM_x should be removed because it came from the raw data.
+            # We also need to rename SPAM_y to SPAM
             joined_df = joined_df.drop(columns=PREDICTION_FIELD_NAME + '_x')
             joined_df = joined_df.rename(columns={PREDICTION_FIELD_NAME + '_y': PREDICTION_FIELD_NAME})
 

@@ -80,7 +80,9 @@ FIELDS = [
 # Fields are needed to do filter, they will be combined to be used for prediction and training
 FILTER_FEATURE_FIELDS = ['Q5', 'Q7', 'Q6', 'Q3']
 
-# Fielded from the raw spreadsheet to be included when processing data
+# Fielded from the raw spreadsheet to be included when processing data,
+# key is the field name we want to use for the processed data dataframe
+# value is the field name being used in the raw data
 FIELDS_TO_INCLUDED_FOR_PROCESSED_DATA_MAPPING = {'ResponseID': 'ResponseID', 'Date': 'EndDate'}
 
 # Field name that represents the filter feature
