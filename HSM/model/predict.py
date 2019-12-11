@@ -9,6 +9,7 @@ from utils.config import (
     FIELDS_TO_INCLUDED_FOR_PROCESSED_DATA_MAPPING,
     FILTER_FEATURE,
     FILTER_FEATURE_FIELDS,
+    NORMALIZED_FILTER_FEATURE,
     PREDICTION_FIELD_NAME,
     survey_id,
 )
@@ -37,8 +38,8 @@ class MakePredictions():
             comments_concatenated += value
             comments_original += f'{field}: {value}\n'
         df['Comments_Concatenated'] = comments_concatenated.apply(lambda x: x.strip())
-        df['Normalized Comments'] = df['Comments_Concatenated'].apply(TrainClassifier().get_lemmas)
-        X = df['Normalized Comments']
+        df[NORMALIZED_FILTER_FEATURE] = df['Comments_Concatenated'].apply(TrainClassifier().get_lemmas)
+        X = df[NORMALIZED_FILTER_FEATURE]
 
         result_series = {s: df[FIELDS_TO_INCLUDED_FOR_PROCESSED_DATA_MAPPING[s]]
                          for s in FIELDS_TO_INCLUDED_FOR_PROCESSED_DATA_MAPPING}
@@ -89,8 +90,9 @@ class MakePredictions():
             print(invalid_fields)
             print("Skipping them in the output...")
 
-        # Only pick out what the user wants to output + the Decision Boundary Distance
-        joined_df = joined_df[valid_fields + ["Decision Boundary Distance"]]
+        # Only pick out what the user wants to output + the filter feature and normalized filter feature,
+        # and the Decision Boundary Distance
+        joined_df = joined_df[valid_fields + [FILTER_FEATURE, NORMALIZED_FILTER_FEATURE, "Decision Boundary Distance"]]
         print("Here is the final list of the valid user-choosen fields in the config.py file we are using.")
         print(list(valid_fields))
 
@@ -104,6 +106,6 @@ class MakePredictions():
         writer.save()
         id_pred_map = dict(zip(labeled_data_df[ENTRY_ID],
                                labeled_data_df[PREDICTION_FIELD_NAME]))
-        df = self.df.drop(labels=['Normalized Comments'], axis=1)
+        df = self.df.drop(labels=[NORMALIZED_FILTER_FEATURE], axis=1)
 
         return results_path, df, id_pred_map, outfile

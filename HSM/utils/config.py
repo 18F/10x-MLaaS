@@ -48,6 +48,9 @@ if not os.path.exists(INPUT_DIR):
 # CELERY SETTINGS
 
 # SPREADSHEET SETTINGS
+
+# [ACTIONS] These are fields that need to be updated for your input dataset.
+# The list of fieldnames that you want to appear in your ClassificationResults.xlsx
 FIELDS = [
     "ResponseID",
     "pageType",
@@ -84,19 +87,22 @@ FIELDS = [
 
 # DATA COLUMNS SETTINGS
 
-# Fields are needed to do filter, they will be combined to be used for prediction and training
+# [ACTIONS] Fields are needed to do filter, they will be combined to be used for prediction and training
 FILTER_FEATURE_FIELDS = ['Q5', 'Q7', 'Q6', 'Q3']
 
-# Fielded from the raw spreadsheet to be included when processing data,
+# [ACTIONS] Fielded from the raw spreadsheet to be included when processing data,
 # key is the field name we want to use for the processed data dataframe
 # value is the field name being used in the raw data
 FIELDS_TO_INCLUDED_FOR_PROCESSED_DATA_MAPPING = {'ResponseID': 'ResponseID', 'Date': 'EndDate'}
 
-# Field name that represents the filter feature
+# [ACTIONS] Field name that represents the filter feature
 FILTER_FEATURE = 'Comments Concatenated'
 
-# Field name to place the prediction/validation
+# [ACTIONS] Field name that represents the normalized filter feature
+NORMALIZED_FILTER_FEATURE = 'Normalized Comments'
+
+# [ACTIONS] Field name to place the prediction/validation
 PREDICTION_FIELD_NAME = 'SPAM'
 
-# Field name that identify each row in the raw spreadsheet
+# [ACTIONS] Field name that identify each row in the raw spreadsheet
 ENTRY_ID = 'ResponseID'

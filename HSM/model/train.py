@@ -19,6 +19,12 @@ from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
 import dill as pickle
 import warnings
+from utils.config import (
+    FILTER_FEATURE,
+    NORMALIZED_FILTER_FEATURE,
+    PREDICTION_FIELD_NAME,
+)
+
 warnings.filterwarnings('ignore')
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -58,7 +64,7 @@ class TrainClassifier():
         metric (str): the classifier scoring metric to use. Choose from:
         accuracy, roc_auc, avg_precision, fbeta, or recall. Note that for fbeta,
         beta = 2.
-        train_df (DataFrame): Training dataframe with 2 columns (Comments Concatenated, SPAM)
+        train_df (DataFrame): Training dataframe with 2 columns FILTER_FEATURE, PREDICTION_FIELD_NAME)
         Default is None
     """
 
@@ -222,7 +228,7 @@ class TrainClassifier():
             train_df = self.train_df
         print("\tNormalizing the text...")
         # normalize the comments, preparing for tf-idf
-        train_df['Normalized Comments'] = train_df['Comments Concatenated'].astype(str).apply(
+        train_df[NORMALIZED_FILTER_FEATURE] = train_df[FILTER_FEATURE].astype(str).apply(
             TrainClassifier.get_lemmas)
         print("\tDone normalizing the text.")
         print("_"*80)
@@ -256,9 +262,9 @@ class TrainClassifier():
                    'fbeta': metrics.make_scorer(metrics.fbeta_score, beta=1.5),
                    'recall': metrics.make_scorer(metrics.recall_score)}
         # clf_name = clf.__class__.__name__
-        X = train_df['Normalized Comments']
+        X = train_df[NORMALIZED_FILTER_FEATURE]
         # y = train_df['Spam']
-        y = train_df['SPAM']
+        y = train_df[PREDICTION_FIELD_NAME]
         X_train, X_test, y_train, y_test = train_test_split(X, y,
                                                             test_size=0.25,
                                                             random_state=123)
