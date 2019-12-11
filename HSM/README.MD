@@ -123,6 +123,27 @@ the virtual environment with `pipenv shell`):
 docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "cd HSM;python load_data.py <file>"
 ```
 
+## Testing
+The current state of the code do not included a lot of automated testing.  During development, to ensure the tool is still working as intended, a manual testing process is necessary to spot check different items.  If you are the general user and not the person who maintain the tool.  You will need to work with the maintainer if any issues come up.
+
+### End-to-end testing
+Assuming that you have already set up the tool to run prediction/training.  These are the steps to follow after to do end-to-end testing:
+
+#### Pulling the data
+- You would need to follow Step 3 to build and run the tool
+- Once the tool pulled the data, you will make sure it didn't fail prematurely.
+
+#### Prediction
+- Once it performed prediction, you will be prompted to check the prediction on the spreadsheet
+- Open the spreadsheet, you would want to check the field that you have specified in `config.py` as `PREDICTION_FIELD_NAME`.  To check if data looks okay, and correct them accordingly.
+- Make sure all the data columns you specified in `config.py` as `FIELDS` are included.
+- There would be columns named as what you specified in `config.py` as `FILTER_FEATURE`, `NORMALIZED_FILTER_FEATURE`, `PREDICTION_FIELD_NAME`, and `ENTRY_ID`.
+- The column with the name specified in `config.py` as `FILTER_FEATURE` should have essential the combination of all of columns in `FILTER_FEATURE_FIELDS`.  They are not directly the same values because the `FILTER_FEATURE` has been processed to pull out some unnecessary words for training purposes.  But do a few spot check from the data to see it captures most of the essential words.
+
+#### Training
+- Once you type `Y` to say the prediction is correct, it will start inserting data into the database, note any errors that come out.
+- Once it inserted all the data, it will start the retraining process.  It should run smoothly with a `Classification Report` that comes out, an ended with a `DONE!`. If at any point, it started hanging, there may be an issue.
+
 
 ## TODO
  - log performance of the models (based on the ground truth established by the validation)
