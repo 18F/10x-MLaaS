@@ -130,7 +130,7 @@ The current state of the code do not included a lot of automated testing.  Durin
 Assuming that you have already set up the tool to run prediction/training.  These are the steps to follow after to do end-to-end testing:
 
 #### Pulling the data
-- You would need to follow Step 3 to build and run the tool
+- You would need to follow [Step 3](#step-3-run-with-docker--docker-compose) under [Getting Started](#getting-started) to build and run the tool
 - Once the tool pulled the data, you will make sure it didn't fail prematurely.
 
 #### Prediction
