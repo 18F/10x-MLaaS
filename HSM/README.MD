@@ -60,7 +60,7 @@ There are specific settings that need to be set in `10x-MLaaS/HSM/utils/config.p
 
 https://docs.docker.com/compose/install/
 
-#### Step 3 Build & Run!  
+#### Step b: Build & Run!
 
 This will bring up the containers:
 ```bash
