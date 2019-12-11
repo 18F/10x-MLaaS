@@ -3,13 +3,13 @@ services:
     web:
         build: .
         tty: true
-        container_name: mlaas-web
+        container_name: ${CONTAINER_NAME_WEB}
         restart: always
         ports:
-            - "8080:8080"
+            - "${HOST_PORT}:8080"
         environment:
-            - DB_NAME=hsm-db
-            - DB_ADDR=mlaas-db
+            - DB_NAME=${DB_NAME}
+            - DB_ADDR=${DB_ADDR}
         env_file:
             - ./.env
         volumes:
@@ -23,11 +23,11 @@ services:
             - ./docker-entrypoint.sh
     db:
         image: "postgres:9.6.5"
-        container_name: mlaas-db
+        container_name: ${CONTAINER_NAME_DB}
         environment:
-            - POSTGRES_USER=hsm
-            - POSTGRES_PASSWORD=hsm
-            - POSTGRES_DB=hsm-db
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASS}
+            - POSTGRES_DB=${DB_NAME}
             - POSTGRES_PORT=5432
         networks:
             - db_nw
