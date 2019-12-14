@@ -1,0 +1,16 @@
+version: '3'
+services:
+    web:
+        build: .
+        tty: true
+        container_name: ${CONTAINER_NAME_WEB}
+        restart: always
+        ports:
+            - "${HOST_PORT}:${HOST_PORT}"
+        env_file:
+            - ./.env
+        volumes:
+            - .:/home/hsm
+        network_mode: "host"
+        entrypoint:
+            - ./docker-entrypoint.sh

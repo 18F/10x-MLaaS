@@ -13,18 +13,22 @@ users = {
 
 # DATABASE SETTINGS
 print(f'CLOUD_GOV:{os.getenv("CLOUD_GOV")}')
-if not os.getenv('CLOUD_GOV'):
-    DIALECT = "postgresql+psycopg2"
+DB_DIALECT = "postgresql+psycopg2"
+if not os.getenv('CLOUD_GOV') or os.getenv('CLOUD_GOV') == 'NO' :
     DB_USER = os.getenv('DB_USER')
     DB_PASS = os.getenv('DB_PASS')
     DB_ADDR = os.getenv('DB_ADDR')
     DB_NAME = os.getenv('DB_NAME')
 
-    SQLALCHEMY_URI = f"{DIALECT}://{DB_USER}:{DB_PASS}@{DB_ADDR}/{DB_NAME}"
+    SQLALCHEMY_URI = f"{DB_DIALECT}://{DB_USER}:{DB_PASS}@{DB_ADDR}/{DB_NAME}"
 else:  # CLOUD_GOV
-    SQLALCHEMY_URI = os.getenv('DATABASE_URL')
-    if "postgresql:" in SQLALCHEMY_URI:  # This means the dialect is not included
-        SQLALCHEMY_URI = SQLALCHEMY_URI.replace("postgresql:" "postgresql+psycopg2:", 1)
+    CLOUD_DB_USER = os.getenv('CLOUD_DB_USER')
+    CLOUD_DB_PASS = os.getenv('CLOUD_DB_PASS')
+    CLOUD_DB_ADDR = os.getenv('CLOUD_DB_ADDR')
+    CLOUD_DB_PORT = os.getenv('CLOUD_DB_PORT')
+    CLOUD_DB_NAME = os.getenv('CLOUD_DB_NAME')
+    SQLALCHEMY_URI = f"{DB_DIALECT}://{CLOUD_DB_USER}:{CLOUD_DB_PASS}@{CLOUD_DB_ADDR}:{CLOUD_DB_PORT}/{CLOUD_DB_NAME}"
+    print(f'SQLALCHEMY_URI: {SQLALCHEMY_URI}')
 
 
 # QUALTRICS API SETTINGS
