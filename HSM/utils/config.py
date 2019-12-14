@@ -14,7 +14,7 @@ users = {
 # DATABASE SETTINGS
 print(f'CLOUD_GOV:{os.getenv("CLOUD_GOV")}')
 DB_DIALECT = "postgresql+psycopg2"
-if not os.getenv('CLOUD_GOV') or os.getenv('CLOUD_GOV') == 'NO' :
+if not os.getenv('CLOUD_GOV') or os.getenv('CLOUD_GOV') == 'NO':
     DB_USER = os.getenv('DB_USER')
     DB_PASS = os.getenv('DB_PASS')
     DB_ADDR = os.getenv('DB_ADDR')
