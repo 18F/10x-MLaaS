@@ -30,7 +30,7 @@ First copy the template in `sample.env`.
 cp sample.env .env
 ```
 
-Modify environment variables to set up for the specific dataset in `.env`.  See details in `.env`.
+Modify environment variables to set up for the specific dataset in `.env`.  See details in `.env`.  If you want to store data on the cloud instead of using a local database and filesystem, see instructions on [Cloud.gov Configuration](cloud-gov-configuration).  This will allow you to have a database and filesystem on the cloud for sharing.
 
 Install Pipenv if it is not installed:
 ```bash
@@ -108,6 +108,49 @@ Now that your environment is set up, you can use `app.py` as a CLI tool. Here's 
     - Return to your terminal and enter `y` to tell the script to wake up and continue.
 
  - Inserts the survey data along with model predictions and your validation into the database.
+
+
+## Cloud.gov Configuration
+These are work-in-progress instructions as they were only quickly tested out.  You will need to swap out `docker-compose.yml` to use the `docker-compose-cloud.yml` file first.  Save the current `docker-compose.yml` at a safe place that you can swap back out if necessary when you want to use database within Docker.  The following commands include moving `docker-compose.yml` to `docker-compose-local.yml`:
+```bash
+mv docker-compose.yml docker-compose-local.yml
+mv docker-compose-cloud.yml docker-compose.yml
+```
+
+### Cloud.gov Database
+This tool makes use of a database to store all the dataset for the purposes of training the model, keeping all the available data to avoid downloading the same data from Qualtrics again.  In order to use a database on Cloud.gov, you will need to have an account on cloud.gov, and you will create an application with a Postgresql database service instance.  This service instance is also binded to the application you create.  Once that is set up, you will need to log into cloud.gov in your terminal:
+```bash
+cf login -a api.fr.cloud.gov --sso
+```
+
+You will need to target your organization and space where your application is in.  Then you will need to install [CF-Service-Connect](https://github.com/18F/cf-service-connect) if you haven't.  This will allow you to SSH tunnel into Cloud.gov environment so you will have access to your database.  Once installed, you will need to connect to the database by running the following command, and replacing those in the `< >`:
+```bash
+cf connect-to-service -no-client <cloud.gov app> <cloud.gov database binded to the app>
+```
+
+You will get an output that looks like this:
+```bash
+It will give you the following output, pull the corresponding information out as environment variables:
+Finding the service instance details...
+Setting up SSH tunnel...
+SSH tunnel created.
+Skipping call to client CLI. Connection information:
+
+Host: localhost
+Port: <CLOUD_DB_PORT>
+Username: <CLOUD_DB_USER>
+Password: <CLOUD_DB_PASS>
+Name: <CLOUD_DB_NAME>
+
+Leave this terminal open while you want to use the SSH tunnel. Press Control-C to stop.
+```
+
+Take the information in the `< >` above and modify the `.env` file accordingly.  You will have to keep this terminal window open throughout the time you run the tool.
+
+If at any time, you are getting errors about the database access, you may have to exit out of this and rerun the `connect-to-service` command.
+
+### Cloud.gov S3 Storage
+This part has not been tested out at all.  The storage is to store the machine learning model.  But you will do the same as you would set up the Cloud.gov database.  You will need to create a new S3 service instance, and bind it to an application.  This is the [detailed instructions on how to interact with S3 outside of Cloud.gov](https://cloud.gov/docs/services/s3/#interacting-with-your-s3-bucket-from-outside-cloud-gov). Code changes are necessary to get this implemented.
 
  
 ## Load Data

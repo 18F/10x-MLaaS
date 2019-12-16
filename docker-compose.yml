@@ -6,7 +6,7 @@ services:
         container_name: ${CONTAINER_NAME_WEB}
         restart: always
         ports:
-            - "${HOST_PORT}:8080"
+            - "${HOST_PORT}:${HOST_PORT}"
         environment:
             - DB_NAME=${DB_NAME}
             - DB_ADDR=${DB_ADDR}
