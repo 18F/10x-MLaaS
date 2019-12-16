@@ -11,12 +11,12 @@
 ### Step 1: Clone the Repository
 Navigate to where you'd like to clone the repo. Then clone it:
 ```bash
-git clone https://github.com/18F/10x-MLaaS.git
+git clone https://github.com/18F/10x-MLaaS.git <Folder name if you do not want to use 10x-MLaaS>
 ```
 
 Now `cd` into the repository you've just cloned:
 ```bash
-cd 10x-MLaaS
+cd 10x-MLaaS # or the folde name you used above
 ```
 
 ### Step 2: Configure the application
