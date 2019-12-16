@@ -111,7 +111,7 @@ Now that your environment is set up, you can use `app.py` as a CLI tool. Here's 
 
 
 ## Cloud.gov Configuration
-This is Work In Progress instructions as they were only quickly tested out.  You will need to swap out `docker-compose.yml` to use the `docker-compose-cloud.yml` file first.  Save the current `docker-compose.yml` at a safe place that you can swap back out if necessary when you want to use database within Docker.  The following commands include moving `docker-compose.yml` to `docker-compose-local.yml`:
+These are work-in-progress instructions as they were only quickly tested out.  You will need to swap out `docker-compose.yml` to use the `docker-compose-cloud.yml` file first.  Save the current `docker-compose.yml` at a safe place that you can swap back out if necessary when you want to use database within Docker.  The following commands include moving `docker-compose.yml` to `docker-compose-local.yml`:
 ```bash
 mv docker-compose.yml docker-compose-local.yml
 mv docker-compose-cloud.yml docker-compose.yml
@@ -145,7 +145,7 @@ Name: <CLOUD_DB_NAME>
 Leave this terminal open while you want to use the SSH tunnel. Press Control-C to stop.
 ```
 
-Take the information in the `< >` above and modify the `.env` file accordingly.  You will have to keep this terminal window open throughtout the time you run the the tool.
+Take the information in the `< >` above and modify the `.env` file accordingly.  You will have to keep this terminal window open throughout the time you run the tool.
 
 If at any time, you are getting errors about the database access, you may have to exit out of this and rerun the `connect-to-service` command.
 
