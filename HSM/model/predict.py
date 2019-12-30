@@ -101,8 +101,8 @@ class MakePredictions():
             os.makedirs(os.path.join(results_dir))
         outfile = 'ClassificationResults_{}_{}.xlsx'.format(survey_id, datetime.now().strftime('%Y%m%d-%H%M%S'))
         results_path = os.path.join(results_dir, outfile)
-        writer = pd.ExcelWriter(results_path)
-        joined_df.to_excel(writer, 'Classification Results', engine='xlsxwriter', index=False)
+        writer = pd.ExcelWriter(results_path, engine='xlsxwriter', options={'strings_to_urls': False})
+        joined_df.to_excel(writer, 'Classification Results', index=False)
         writer.save()
         id_pred_map = dict(zip(labeled_data_df[ENTRY_ID],
                                labeled_data_df[PREDICTION_FIELD_NAME]))
