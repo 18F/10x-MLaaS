@@ -2,7 +2,7 @@
 # 10x Machine Learning as a Service
 [Formerly known as Qualitative Data Management]
 
-We are currently in the **third phase of [10x](tenx): Development**. We estimate this phase to last approximately 6 months and will end in May 2019.
+We are currently in the **third phase of [10x](tenx): Development**. We estimate this phase will end in April 2020.
 
 ## Overview
 
@@ -18,12 +18,17 @@ We are currently in the **third phase of [10x](tenx): Development**. We estimate
 
 As expected, the scope of our project has shifted to offering these machine learning tools to the entire Office of Customer Experience. During Phase II, we prototyped and delivered a machine learning tool to aid the USAgov team but we believe this tool (or similar SaaS) could be leveraged to reduce the burden on other teams in the Office of Customer Experience, as well as outside GSA.
 
+During Phase III, we narrowed the scope from development of an expansive machine learning service to building a MVP that will use open text data to (1)provide data insights, and (2) decrease time to classify and identify themes manually. We would like to introduce you to _MeL_ which uses machine learning to filter, classify and provide user sentiment, so that you have greater insights into your text data in less time.
+
+We continue to work the Office of Customer Experience on the development of this MVP and are looking to work with other federal agencies and datasets to explore different use cases for MeL. 
+
+
 ## Who are we?
 
 Team members:
 
-- Amos Stone, Innovation Specialist, [18F](eighteenf)
-- Colin Craig, Innovation Specialist, [18F](eighteenf)
+- Tiffany Andrews, Innovation Specialist, [18F](eighteenf)
+- Amy Mok, Innovation Specialist, [18F](eighteenf)
 - Will Cahoe, Program Analyst, [10x](tenx)
 
 
@@ -34,6 +39,8 @@ Advisers:
 - Scott McAllister, Data Scientist, [Office of Products and Platforms](opp)
 
 Former team members:
+- Amos Stone, Innovation Specialist, [Login](login)
+- Colin Craig, Innovation Specialist, [18F](eighteenf)
 - Chris Goranson, research, [18F](tenx)
 - Kate Saul, research, [18F](eighteenf)
 
