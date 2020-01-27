@@ -6,6 +6,9 @@
 - [Python](https://www.python.org/) (3.6)
 - [pipenv](https://pipenv.kennethreitz.org/en/latest/)
 
+## Limitations
+- Currently we are in testing phase.  We have only tested to have about 18K rows of data to process.  If the data is larger than that, there is a chance that model cannot be trained as there is an issue that is unresolved at this point.  See [issue description here](https://github.com/18F/10x-MLaaS/issues/100).
+
 ## Getting Started
 
 ### Step 1: Clone the Repository
