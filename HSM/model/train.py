@@ -295,7 +295,7 @@ class TrainClassifier():
 
         random_search = RandomizedSearchCV(pipe, param_distributions=param_dist,
                                            scoring=scoring, refit=score,
-                                           n_iter=n_iter_search, cv=5, n_jobs=-1,
+                                           n_iter=n_iter_search, cv=5, n_jobs=1,
                                            verbose=1)
         random_search.fit(X_train, y_train)
         y_pred = random_search.predict(X_test)
