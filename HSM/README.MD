@@ -57,30 +57,33 @@ After that is done you will see `(10x-MLaaS)` or the name of the base folder if 
 #### Step b: Configure Data Columns
 There are specific settings that need to be set in `10x-MLaaS/HSM/utils/config.py` in order to know how to read the input dataset for prediction.  Those that has a label of `[ACTION]` will need to be updated according to your specific dataset.  These items are used to know how to create the classification results spreadsheet, which columns are used for filter feature, prediction, row identifier, and which columns are needed to process data.
 
-### Step 3: Run with Docker & Docker Compose
-
-#### Step a: Install Docker (if you do not have docker already)
+### Step 3: Install Docker
+NOTE: You can skip this step if Docker is already installed on your system.
 
 https://docs.docker.com/compose/install/
 
-#### Step b: Build & Run!
 
-This will bring up the containers:
-```bash
-docker-compose up --build
+## Using the Tool
+#### Launching HSM and the Qualtrics Updater
+
+In the top-level of the repository, there is a folder named `launcher`.
+Within that folder, there are two files that end in `.command`:
+```
+start_hsm.command
+```
+and
+```
+update_qualtrics.command
 ```
 
-##### Input dataset via Qualtrics API
-If the input exists in Qualtrics, you can run the command without any parameters.
+You can double-click these files to launch them:
+1. Double-click `start-hsm.command` to launch the HSM tool, which should be running before you proceed to the next step.
+2. Double-click `update-qualtrics.command` to the launch the Qualtrics Updater, which pulls down survey data from
+Qualtrics. If you intend to load data other than Qualtics survey data, you will currently have to use the command line
+to load that data (for example, loading data from an Excel spreadsheet - please see below)
 
-(In another terminal).  This will run the application within `${CONTAINER_NAME_WEB}`.  `${CONTAINER_NAME_WEB}` is an
-environment variable you have specified in your `.env` file.
-```bash
-pipenv shell
-docker exec --user hsm --workdir /home/hsm -it ${CONTAINER_NAME_WEB} /bin/bash -c "python ~/HSM/app.py"
-```
 
-##### Input dataset is an Excel Spreadsheet
+### Input dataset is an Excel Spreadsheet
 If the input is an Excel file (.xlsx), the Excel input file requires to be saved in `10x-MLaaS/HSM/model/inputs`.
 You will need to only supply the filename in the command below. Replace <filename> with the actual filename.
 
