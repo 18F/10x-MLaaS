@@ -2,7 +2,9 @@
 # 10x Machine Learning as a Service
 [Formerly known as Qualitative Data Management]
 
-We are currently in the **third phase of [10x](tenx): Development**. We estimate this phase will end in April 2020.
+Making is easier to identity what information the public is looking for. 
+
+We are currently in the **third phase of [10x](tenx): Development**. We estimate this phase will end in May 2020.
 
 ## Overview
 
@@ -22,13 +24,15 @@ During Phase III, we narrowed the scope from development of an expansive machine
 
 We continue to work the Office of Customer Experience on the development of this MVP and are looking to work with other federal agencies and datasets to explore different use cases for MeL. 
 
+You can follow _MeL_ development journey [here](https://github.com/18F/10x-MeL/).
+
 
 ## Who are we?
 
 Team members:
 
 - Tiffany Andrews, Innovation Specialist, [18F](eighteenf)
-- Amy Mok, Innovation Specialist, [18F](eighteenf)
+- Adam Gerber, Flexion Data Scientist and Machine Learning Engineer
 - Will Cahoe, Program Analyst, [10x](tenx)
 
 
@@ -39,6 +43,7 @@ Advisers:
 - Scott McAllister, Data Scientist, [Office of Products and Platforms](opp)
 
 Former team members:
+- Amy Mok, Innovation Specialist, [18F](eighteenf)
 - Amos Stone, Innovation Specialist, [Login](login)
 - Colin Craig, Innovation Specialist, [18F](eighteenf)
 - Chris Goranson, research, [18F](tenx)
