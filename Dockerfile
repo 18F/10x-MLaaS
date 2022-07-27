@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.11.0b5
 
 RUN apt-get update && apt-get install -y postgresql-client
 
